@@ -2,3 +2,4 @@ back-end/bin
 back-end/obj
 back-end/.vs
 front-end/node_modules
+front-end/.next
