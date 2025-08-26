@@ -1,11 +1,10 @@
 import { cookies } from "next/headers";
-import { jwtVerify, JWTPayload } from "jose";
-import { NextResponse } from "next/server";
+import { jwtVerify } from "jose";
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
 
-export interface JwtPayload extends JWTPayload {
-    [key: string]: any;
+export interface JwtPayload {
+    [key: string]: string;
 }
 
 export async function validateToken(token?: string): Promise<boolean> {
@@ -15,7 +14,7 @@ export async function validateToken(token?: string): Promise<boolean> {
         const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
         await jwtVerify(token, secret);
         return true;
-    } catch (err) {
+    } catch {
         return false;
     }
 }
@@ -29,7 +28,7 @@ export async function getClaimsFromToken(): Promise<JwtPayload | null> {
     try {
         const { payload } = await jwtVerify(token, secret);
         return payload as JwtPayload;
-    } catch (err) {
+    } catch {
         return null;
     }
 }
