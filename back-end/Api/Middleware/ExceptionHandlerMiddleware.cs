@@ -15,7 +15,7 @@ public class ExceptionHandlingMiddleware
     {
         try
         {
-            await _next(context); // Proceed to next middleware/controller
+            await _next(context);
         }
         catch (BusinessRuleException ex)
         {

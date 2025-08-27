@@ -22,7 +22,6 @@ namespace backend.Domain.Models
         public string Password { get; set; }
         public ICollection<Ticket> Tickets { get; set; }
 
-        // Navigation properties
         public ICollection<UserRole> UserRoles { get; set; }
         public bool VerifyPassword(string password)
         {

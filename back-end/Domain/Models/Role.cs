@@ -8,9 +8,9 @@ namespace backend.Domain.Models
         public int Id { get; set; }
 
         [Required]
-        public string Name { get; set; }  // e.g., "Admin", "Agent"
+        public string Name { get; set; }
 
-        // Navigation properties
+
         public ICollection<UserRole> UserRoles { get; set; }
         public ICollection<RolePermission> RolePermissions { get; set; }
     }

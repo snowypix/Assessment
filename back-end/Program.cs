@@ -16,10 +16,10 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowNextJsApp", policy =>
     {
-        policy.WithOrigins("http://localhost:3000") // <-- your frontend URL
+        policy.WithOrigins("http://localhost:3000") // 
               .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials();  // IMPORTANT: to allow cookies
+              .AllowCredentials();
     });
 });
 
@@ -52,15 +52,14 @@ builder.Services.AddAuthentication(options =>
         RoleClaimType = ClaimTypes.Role
     };
 
-    // Allow token from HttpOnly cookie if no Authorization header is present
     options.Events = new JwtBearerEvents
     {
         OnMessageReceived = context =>
         {
-            // If no Authorization header, try cookie
+
             if (string.IsNullOrEmpty(context.Token))
             {
-                var accessToken = context.Request.Cookies["auth_token"]; // Your cookie name
+                var accessToken = context.Request.Cookies["auth_token"];
                 if (!string.IsNullOrEmpty(accessToken))
                 {
                     context.Token = accessToken;
@@ -103,7 +102,7 @@ app.UseCors("AllowNextJsApp");
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbcontext>();
-    context.Database.Migrate(); // applies migrations
+    context.Database.Migrate();
 
     if (!context.Users.Any())
     {
@@ -135,10 +134,10 @@ using (var scope = app.Services.CreateScope())
         };
         context.Permissions.AddRange(permissions);
 
-        // ---- RolePermissions ----
+
         var rolePermissions = new List<RolePermission>
         {
-            // Admin → all permissions
+
             new RolePermission { RoleId = 1, PermissionId = 1 },
             new RolePermission { RoleId = 1, PermissionId = 2 },
             new RolePermission { RoleId = 1, PermissionId = 3 },
@@ -146,12 +145,12 @@ using (var scope = app.Services.CreateScope())
             new RolePermission { RoleId = 1, PermissionId = 5 },
             new RolePermission { RoleId = 1, PermissionId = 6 },
 
-            // Manager → ViewTrips, ManageTrips, ViewStations
+
             new RolePermission { RoleId = 2, PermissionId = 3 },
             new RolePermission { RoleId = 2, PermissionId = 4 },
             new RolePermission { RoleId = 2, PermissionId = 5 },
 
-            // User → ViewTrips, ViewStations
+
             new RolePermission { RoleId = 3, PermissionId = 3 },
             new RolePermission { RoleId = 3, PermissionId = 5 }
         };
