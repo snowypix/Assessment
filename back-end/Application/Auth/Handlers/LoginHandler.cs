@@ -18,10 +18,11 @@ public class LoginHandler
 
     public async Task<string?> Handle(LoginCommand command, CancellationToken ct)
     {
-        var user = await _userRepo.GetByEmailAsync(command.Email, ct);
-        if (user == null || !user.VerifyPassword(command.Password))
-            return null;
-
-        return _jwtService.GenerateToken(user, user.UserRoles.Select(r => r.Role.Name));
+        var dto = new loginDTO
+        {
+            Email = command.Email,
+            Password = command.Password
+        };
+        return await _jwtService.GenerateToken(dto);
     }
 }

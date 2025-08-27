@@ -1,4 +1,5 @@
 using backend.Application.DTOs;
+using backend.Application.interfaces;
 using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -8,7 +9,7 @@ using System.Security.Claims;
 using System.Text;
 namespace backend.Infrastructure.Services
 {
-    public class JwtService
+    public class JwtService : IJwtService
     {
         private readonly AppDbcontext _context;
 

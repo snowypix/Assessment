@@ -40,6 +40,62 @@ namespace backend.Infrastructure.Services
                 .WithMany(p => p.RolePermissions)
                 .HasForeignKey(rp => rp.PermissionId);
 
+            // Station
+            modelBuilder.Entity<Station>()
+                .HasKey(s => s.Code);
+
+            modelBuilder.Entity<Station>()
+                .Property(s => s.Code)
+                .IsRequired()
+                .HasMaxLength(10);
+
+            modelBuilder.Entity<Station>()
+                .Property(s => s.Name)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            // Train
+            modelBuilder.Entity<Train>()
+                .HasKey(t => t.Code);
+
+            modelBuilder.Entity<Train>()
+                .Property(t => t.Code)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<Train>()
+                .Property(t => t.Type)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<Train>()
+                .Property(t => t.Status)
+                .HasMaxLength(20);
+
+            // Trip
+            modelBuilder.Entity<Trip>()
+                .HasKey(tr => tr.Code);
+
+            modelBuilder.Entity<Trip>()
+                .HasOne(tr => tr.Train)
+                .WithMany(t => t.Trips)
+                .HasForeignKey(tr => tr.TrainId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Trip>()
+                .HasOne(tr => tr.DepartureStation)
+                .WithMany(s => s.DepartureTrips)
+                .HasForeignKey(tr => tr.DepartureStationId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Trip>()
+                .HasOne(tr => tr.ArrivalStation)
+                .WithMany(s => s.ArrivalTrips)
+                .HasForeignKey(tr => tr.ArrivalStationId)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Trip>()
+                .Property(tr => tr.Status)
+                .HasMaxLength(20);
+
         }
 
         public DbSet<User> Users { get; set; }
@@ -47,5 +103,9 @@ namespace backend.Infrastructure.Services
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
         public DbSet<RolePermission> RolePermissions { get; set; }
+
+        public DbSet<Station> Stations { get; set; }
+        public DbSet<Train> Trains { get; set; }
+        public DbSet<Trip> Trips { get; set; }
     }
 }

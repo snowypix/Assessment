@@ -1,3 +1,4 @@
+using backend.Application.DTOs;
 using backend.Domain.Models;
 
 namespace backend.Application.interfaces
@@ -5,6 +6,6 @@ namespace backend.Application.interfaces
 
     public interface IJwtService
     {
-        string GenerateToken(User user, IEnumerable<string> roles);
+        public Task<string> GenerateToken(loginDTO loginDto);
     }
 }

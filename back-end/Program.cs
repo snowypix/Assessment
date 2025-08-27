@@ -6,6 +6,9 @@ using System.Text;
 using HotChocolate.AspNetCore;
 using backend.Infrastructure.Services;
 using backend.Application.Auth.Handlers;
+using backend.Application.Interfaces;
+using backend.Infrastructure.Repositories;
+using backend.Application.interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
@@ -78,9 +81,10 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("User.Manage", policy =>
         policy.RequireClaim("permission", "User.Manage"));
 });
-builder.Services.AddScoped<JwtService>();
+builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<LoginHandler>();
 builder.Services.AddScoped<RegisterHandler>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddAutoMapper(typeof(Program));
 var app = builder.Build();
 
