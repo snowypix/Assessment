@@ -1,0 +1,267 @@
+"use client";
+
+import type React from "react";
+
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Pencil, Trash2, Plus } from "lucide-react";
+
+interface Train {
+  code: number;
+  capacity: number;
+  type: string;
+  status: string;
+}
+
+export default function TrainsPage() {
+  const [trains, setTrains] = useState<Train[]>([
+    { code: 101, capacity: 200, type: "Express", status: "Active" },
+    { code: 102, capacity: 150, type: "Local", status: "Active" },
+    { code: 103, capacity: 300, type: "High-Speed", status: "Maintenance" },
+  ]);
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingTrain, setEditingTrain] = useState<Train | null>(null);
+  const [formData, setFormData] = useState({
+    code: "",
+    capacity: "",
+    type: "",
+    status: "",
+  });
+
+  const handleAdd = () => {
+    setEditingTrain(null);
+    setFormData({ code: "", capacity: "", type: "", status: "" });
+    setIsDialogOpen(true);
+  };
+
+  const handleEdit = (train: Train) => {
+    setEditingTrain(train);
+    setFormData({
+      code: train.code.toString(),
+      capacity: train.capacity.toString(),
+      type: train.type,
+      status: train.status,
+    });
+    setIsDialogOpen(true);
+  };
+
+  const handleDelete = (code: number) => {
+    setTrains(trains.filter((train) => train.code !== code));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const newTrain: Train = {
+      code: Number.parseInt(formData.code),
+      capacity: Number.parseInt(formData.capacity),
+      type: formData.type,
+      status: formData.status,
+    };
+
+    if (editingTrain) {
+      setTrains(
+        trains.map((train) =>
+          train.code === editingTrain.code ? newTrain : train
+        )
+      );
+    } else {
+      setTrains([...trains, newTrain]);
+    }
+
+    setIsDialogOpen(false);
+    setFormData({ code: "", capacity: "", type: "", status: "" });
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-50">
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900">
+              Train Management
+            </h1>
+            <p className="text-slate-600 mt-2">Manage your train fleet</p>
+          </div>
+          <Button
+            onClick={handleAdd}
+            className="bg-amber-600 hover:bg-amber-700"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add Train
+          </Button>
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>All Trains</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Code</TableHead>
+                  <TableHead>Capacity</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {trains.map((train) => (
+                  <TableRow key={train.code}>
+                    <TableCell className="font-medium">{train.code}</TableCell>
+                    <TableCell>{train.capacity}</TableCell>
+                    <TableCell>{train.type}</TableCell>
+                    <TableCell>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          train.status === "Active"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-yellow-100 text-yellow-800"
+                        }`}
+                      >
+                        {train.status}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEdit(train)}
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDelete(train.code)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>
+                {editingTrain ? "Edit Train" : "Add New Train"}
+              </DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <Label htmlFor="code">Train Code</Label>
+                <Input
+                  id="code"
+                  type="number"
+                  value={formData.code}
+                  onChange={(e) =>
+                    setFormData({ ...formData, code: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="capacity">Capacity</Label>
+                <Input
+                  id="capacity"
+                  type="number"
+                  value={formData.capacity}
+                  onChange={(e) =>
+                    setFormData({ ...formData, capacity: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="type">Type</Label>
+                <Select
+                  value={formData.type}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, type: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select train type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Express">Express</SelectItem>
+                    <SelectItem value="Local">Local</SelectItem>
+                    <SelectItem value="High-Speed">High-Speed</SelectItem>
+                    <SelectItem value="Freight">Freight</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="status">Status</Label>
+                <Select
+                  value={formData.status}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, status: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Active">Active</SelectItem>
+                    <SelectItem value="Maintenance">Maintenance</SelectItem>
+                    <SelectItem value="Retired">Retired</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex gap-2 pt-4">
+                <Button
+                  type="submit"
+                  className="bg-amber-600 hover:bg-amber-700"
+                >
+                  {editingTrain ? "Update" : "Create"}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsDialogOpen(false)}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </div>
+  );
+}

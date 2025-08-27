@@ -47,8 +47,12 @@ export default function RegisterPage() {
       }
 
       router.push("/");
-    } catch (err: unknown) {
-      setError(err.message);
+    } catch (err) {
+      if (err instanceof Error) {
+        console.error(err.message);
+      } else {
+        console.error("Unknown error", err);
+      }
     } finally {
       setLoading(false);
     }
