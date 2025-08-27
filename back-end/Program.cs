@@ -108,9 +108,9 @@ using (var scope = app.Services.CreateScope())
     {
         var plannerRole = new Role { Id = 1, Name = "Planner" };
         var managerRole = new Role { Id = 2, Name = "Manager" };
-        var userRole = new Role { Id = 3, Name = "User" };
+        var clientRole = new Role { Id = 3, Name = "Client" };
 
-        context.Roles.AddRange(plannerRole, managerRole, userRole);
+        context.Roles.AddRange(plannerRole, managerRole, clientRole);
 
         var planner = new User { Id = 1, Nom = "planner", Password = "$2a$11$J7cDcNsIlKGAaFWehF6NjuznMxilF91oxQ2dKWHl4ljNQK5kAT9FW", Email = "admin@example.com", CIN = "A15" };
         var manager = new User { Id = 2, Nom = "manager", Password = "$2a$11$J7cDcNsIlKGAaFWehF6NjuznMxilF91oxQ2dKWHl4ljNQK5kAT9FW", Email = "manager@example.com", CIN = "A16" };

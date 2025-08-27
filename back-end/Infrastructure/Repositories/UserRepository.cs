@@ -21,6 +21,8 @@ public class UserRepository : IUserRepository
 
     public async Task AddAsync(User user, CancellationToken ct)
     {
+        var clientRole = await _db.Roles.FirstAsync(r => r.Name == "Client", ct);
+        user.AssignDefaultRole(clientRole);
         _db.Users.Add(user);
         await _db.SaveChangesAsync(ct);
     }

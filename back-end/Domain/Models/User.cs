@@ -22,7 +22,7 @@ namespace backend.Domain.Models
         public string Password { get; set; }
         public ICollection<Ticket> Tickets { get; set; }
 
-        public ICollection<UserRole> UserRoles { get; set; }
+        public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
         public bool VerifyPassword(string password)
         {
             var hash = HashPassword(password);
@@ -34,6 +34,10 @@ namespace backend.Domain.Models
             using var sha256 = SHA256.Create();
             var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
             return Convert.ToBase64String(bytes);
+        }
+        public void AssignDefaultRole(Role clientRole)
+        {
+            UserRoles.Add(new UserRole { User = this, Role = clientRole });
         }
     }
 }
