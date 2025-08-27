@@ -20,19 +20,19 @@ public class AuthController : ControllerBase
         _registerHandler = registerHandler;
     }
 
-    [HttpGet("test/{id}")]
+    [HttpGet("{id}")]
     [Authorize(Policy = "Invoice.Read")]
     public IActionResult GetInvoice(int id)
     {
         return Ok(new { InvoiceId = id, Status = "Test ok" });
     }
 
-    [HttpPost("auth/login")]
+    [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] loginDTO loginDto, CancellationToken ct)
     {
         var token = await _loginHandler.Handle(new LoginCommand(loginDto.Email, loginDto.Password), ct);
 
-        if (token is null)
+        if (token == "")
             return BadRequest(new { message = "Invalid email or password" });
 
         Response.Cookies.Append("auth_token", token, new CookieOptions
@@ -46,7 +46,7 @@ public class AuthController : ControllerBase
         return Ok(new { message = "Login successful" });
     }
 
-    [HttpPost("auth/register")]
+    [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterDTO dto, CancellationToken ct)
     {
         var user = await _registerHandler.Handle(new RegisterCommand(dto.Email, dto.Password, dto.Nom), ct);

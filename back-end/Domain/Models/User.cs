@@ -20,6 +20,7 @@ namespace backend.Domain.Models
 
         [Required]
         public string Password { get; set; }
+        public ICollection<Ticket> Tickets { get; set; }
 
         // Navigation properties
         public ICollection<UserRole> UserRoles { get; set; }

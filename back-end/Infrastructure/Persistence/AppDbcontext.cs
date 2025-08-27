@@ -13,7 +13,6 @@ namespace backend.Infrastructure.Services
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
             modelBuilder.Entity<UserRole>()
                 .HasKey(ur => new { ur.UserId, ur.RoleId });
 
@@ -95,7 +94,10 @@ namespace backend.Infrastructure.Services
             modelBuilder.Entity<Trip>()
                 .Property(tr => tr.Status)
                 .HasMaxLength(20);
-
+            // Ticket
+            modelBuilder.Entity<Ticket>().HasKey(t => t.Code);
+            modelBuilder.Entity<Ticket>().Property(t => t.QrCode).HasMaxLength(30);
+            modelBuilder.Entity<Ticket>().HasOne(t => t.Client).WithMany(u => u.Tickets).HasForeignKey(t => t.ClientId).OnDelete(DeleteBehavior.Restrict);
         }
 
         public DbSet<User> Users { get; set; }
