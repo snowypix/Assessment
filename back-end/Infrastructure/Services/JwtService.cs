@@ -33,27 +33,27 @@ namespace backend.Infrastructure.Services
             {
                 return "";
             }
-            // Gather role names
+
             var roles = user.UserRoles.Select(ur => ur.Role.Name).ToList();
 
-            // Gather permissions through roles
+
             var permissions = user.UserRoles
                 .SelectMany(ur => ur.Role.RolePermissions)
                 .Select(rp => rp.Permission.Name)
                 .Distinct()
                 .ToList();
 
-            // Build claims list
+
             var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Nom)
             };
 
-            // Add role claims
+
             claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
-            // Add permission claims (use custom claim type)
+
             claims.AddRange(permissions.Select(p => new Claim("permission", p)));
 
             var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));

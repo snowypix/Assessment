@@ -49,10 +49,7 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterDTO dto, CancellationToken ct)
     {
-        var user = await _registerHandler.Handle(new RegisterCommand(dto.Email, dto.Password, dto.Nom), ct);
-        if (user == null)
-            return BadRequest(new { message = "User already exists" });
-
+        var user = await _registerHandler.Handle(new RegisterCommand(dto.Email, dto.Password, dto.Nom, dto.CIN), ct);
         return Ok(new { user.Id, user.Nom, user.Email });
     }
 
