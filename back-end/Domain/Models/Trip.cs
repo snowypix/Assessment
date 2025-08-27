@@ -22,7 +22,13 @@ namespace backend.Domain.Models
         public DateInterval Duration { get; set; }
         [Required]
 
+        public DateInterval Delay { get; set; }
+        [Required]
+
         public string Status { get; set; }
+
+        [Required]
+        public int Price { get; set; }
         [Required]
         public Station DepartureStation { get; set; }
         public int DepartureStationId { get; set; }

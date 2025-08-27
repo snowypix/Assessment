@@ -18,8 +18,6 @@ namespace backend.Domain.Models
         [Required]
         public string QrCode { get; set; }
         [Required]
-        public int Price { get; set; }
-        [Required]
         public int Class { get; set; }
         [Required]
         public User Client { get; set; }

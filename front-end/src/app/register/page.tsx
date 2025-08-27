@@ -14,9 +14,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function SignInPage() {
+export default function RegisterPage() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [cin, setCIN] = useState<string>("");
+  const [name, setName] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const router = useRouter();
@@ -27,14 +29,14 @@ export default function SignInPage() {
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API}/api/auth/login`,
+        `${process.env.NEXT_PUBLIC_API}/api/auth/register`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           credentials: "include",
-          body: JSON.stringify({ email, password }),
+          body: JSON.stringify({ nom: name, email, password, cin }),
         }
       );
 
@@ -45,8 +47,8 @@ export default function SignInPage() {
       }
 
       router.push("/");
-    } catch (err: any) {
-      setError(err);
+    } catch (err: unknown) {
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -60,31 +62,51 @@ export default function SignInPage() {
             <Train className="h-8 w-8" />
             <span className="text-2xl font-bold">RailTime</span>
           </Link>
-          <h1 className="text-2xl font-bold text-balance">Welcome Back</h1>
+          <h1 className="text-2xl font-bold text-balance">Create Account</h1>
           <p className="text-muted-foreground text-balance">
-            Sign in to your account to continue
+            Join RailTime to book tickets and manage your trips
           </p>
         </div>
 
-        {/* Sign In Form */}
+        {/* Register Form */}
         <Card>
           <CardHeader>
-            <CardTitle>Sign In</CardTitle>
+            <CardTitle>Register</CardTitle>
             <CardDescription>
-              Enter your credentials to access your account
+              Create your account to get started
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Name</Label>
+                  <Input
+                    id="name"
+                    placeholder="John Doe"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </div>
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder="john.doe@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="cin">CIN</Label>
+                <Input
+                  id="cin"
+                  type="text"
+                  placeholder="xxxx"
+                  value={cin}
+                  onChange={(e) => setCIN(e.target.value)}
                 />
               </div>
               <div className="space-y-2">
@@ -92,49 +114,56 @@ export default function SignInPage() {
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Enter your password"
+                  placeholder="Create a strong password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  required
                 />
               </div>
-              <div className="flex items-center justify-between text-sm">
-                <label className="flex items-center gap-2">
-                  <input type="checkbox" className="rounded" />
-                  Remember me
-                </label>
-                <Link href="#" className="text-primary hover:underline">
-                  Forgot password?
-                </Link>
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  placeholder="Confirm your password"
+                />
               </div>
-
-              {error && <p className="text-red-500 text-sm">{error}</p>}
-
+              <div className="flex items-start gap-2 text-sm">
+                <input type="checkbox" className="rounded mt-0.5" />
+                <label className="text-muted-foreground">
+                  I agree to the{" "}
+                  <Link href="#" className="text-primary hover:underline">
+                    Terms of Service
+                  </Link>{" "}
+                  and{" "}
+                  <Link href="#" className="text-primary hover:underline">
+                    Privacy Policy
+                  </Link>
+                </label>
+              </div>
               <Button
                 type="submit"
                 className="w-full"
                 size="lg"
                 disabled={loading}
               >
-                {loading ? "Signing In..." : "Sign In"}
+                {loading ? "Creating Account ..." : "Create Account"}
               </Button>
+              <div className="text-center text-sm text-muted-foreground">
+                Already have an account?{" "}
+                <Link
+                  href="/login"
+                  className="text-primary hover:underline font-medium"
+                >
+                  Sign in
+                </Link>
+              </div>
             </form>
-
-            <div className="text-center text-sm text-muted-foreground">
-              Don&apos;t have an account?{" "}
-              <Link
-                href="/register"
-                className="text-primary hover:underline font-medium"
-              >
-                Create one
-              </Link>
-            </div>
           </CardContent>
         </Card>
 
         {/* Additional Options */}
         <div className="mt-6 text-center">
-          <p className="text-sm text-muted-foreground mb-4">Or continue with</p>
+          <p className="text-sm text-muted-foreground mb-4">Or register with</p>
           <div className="grid grid-cols-2 gap-3">
             <Button variant="outline" className="w-full bg-transparent">
               Google

@@ -23,6 +23,7 @@ public class UserRepository : IUserRepository
     {
         var clientRole = await _db.Roles.FirstAsync(r => r.Name == "Client", ct);
         user.AssignDefaultRole(clientRole);
+        user.Password = user.HashPassword(user.Password);
         _db.Users.Add(user);
         await _db.SaveChangesAsync(ct);
     }
