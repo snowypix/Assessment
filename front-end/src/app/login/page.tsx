@@ -46,7 +46,7 @@ export default function SignInPage() {
 
       router.push("/");
     } catch (err: any) {
-      setError(err);
+      setError(err.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
