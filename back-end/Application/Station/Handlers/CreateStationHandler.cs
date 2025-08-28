@@ -5,11 +5,11 @@ using MediatR;
 
 namespace backend.Application.Stations.Handlers
 {
-    public class CreateStationHandler : IRequestHandler<CreateStationCommand, Station>
+    public class CreateTrainHandler : IRequestHandler<CreateStationCommand, Station>
     {
         private readonly IStationRepository _repo;
 
-        public CreateStationHandler(IStationRepository repo) => _repo = repo;
+        public CreateTrainHandler(IStationRepository repo) => _repo = repo;
 
         public async Task<Station> Handle(CreateStationCommand request, CancellationToken ct)
         {

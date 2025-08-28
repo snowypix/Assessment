@@ -82,7 +82,8 @@ var perms = new List<Permission>
         new Permission { Id = 4, Name = "ViewTrips" },
         new Permission { Id = 5, Name = "ManageTrips" },
         new Permission { Id = 6, Name = "ViewStations" },
-        new Permission { Id = 7, Name = "ManageStations" }
+        new Permission { Id = 7, Name = "ManageStations" },
+        new Permission { Id = 8, Name = "ManageTrains" }
     };
 builder.Services.AddAuthorization(options =>
 {
@@ -99,11 +100,19 @@ builder.Services.AddScoped<LoginHandler>();
 builder.Services.AddScoped<RegisterHandler>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IStationRepository, StationRepository>();
+builder.Services.AddScoped<ITrainRepository, TrainRepository>();
+
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddMediatR(configuration =>
 {
-    configuration.RegisterServicesFromAssembly(typeof(CreateStationHandler).Assembly);
+    configuration.RegisterServicesFromAssembly(typeof(CreateTrainHandler).Assembly);
 });
+// builder.Services.AddMediatR(cfg =>
+// cfg.RegisterServicesFromAssembly(typeof(QueriesHandler).Assembly));
+foreach (var service in builder.Services.Where(s => s.ServiceType.Name.Contains("Handler")))
+{
+    Console.WriteLine($"[MediatR] Registered handler: {service.ServiceType}");
+}
 builder.Services.AddValidatorsFromAssembly(typeof(backend.Application.Stations.Commands.CreateStationCommand).Assembly);
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
@@ -149,7 +158,8 @@ using (var scope = app.Services.CreateScope())
             new Permission { Id = 4, Name = "ViewTrips" },
             new Permission { Id = 5, Name = "ManageTrips" },
             new Permission { Id = 6, Name = "ViewStations" },
-            new Permission { Id = 7, Name = "ManageStations" }
+            new Permission { Id = 7, Name = "ManageStations" },
+            new Permission { Id = 8, Name = "ManageTrains" }
         };
         context.Permissions.AddRange(permissions);
 

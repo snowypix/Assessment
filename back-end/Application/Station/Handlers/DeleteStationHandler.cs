@@ -4,11 +4,11 @@ using MediatR;
 
 namespace backend.Application.Stations.Handlers
 {
-    public class DeleteStationHandler : IRequestHandler<DeleteStationCommand, bool>
+    public class DeleteTrainHandler : IRequestHandler<DeleteStationCommand, bool>
     {
         private readonly IStationRepository _repo;
 
-        public DeleteStationHandler(IStationRepository repo) => _repo = repo;
+        public DeleteTrainHandler(IStationRepository repo) => _repo = repo;
 
         public async Task<bool> Handle(DeleteStationCommand request, CancellationToken ct)
         {

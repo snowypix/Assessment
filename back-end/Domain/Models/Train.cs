@@ -13,6 +13,18 @@ namespace backend.Domain.Models
         public Train()
         {
         }
+        public Train(int capacite, string type, string status)
+        {
+            Capacity = capacite;
+            Type = type;
+            Status = status;
+        }
+        public void Update(string type, int capacite, string status)
+        {
+            Capacity = capacite;
+            Type = type;
+            Status = status;
+        }
         [Key]
         public int Code { get; set; }
         [Required]
