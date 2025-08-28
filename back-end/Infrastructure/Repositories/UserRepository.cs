@@ -1,5 +1,6 @@
 using backend.Application.Interfaces;
 using backend.Domain.Models;
+using backend.Infrastructure.Persistence;
 using backend.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 

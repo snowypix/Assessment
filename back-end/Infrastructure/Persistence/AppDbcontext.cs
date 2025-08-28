@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.Intrinsics.Arm;
 
-namespace backend.Infrastructure.Services
+namespace backend.Infrastructure.Persistence
 {
     public class AppDbcontext : DbContext
     {

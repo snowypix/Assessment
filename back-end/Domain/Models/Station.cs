@@ -13,6 +13,14 @@ namespace backend.Domain.Models
         public Station()
         {
         }
+        public Station(string name)
+        {
+            Name = name;
+        }
+        public void Update(string name)
+        {
+            Name = name;
+        }
         [Key]
         public int Code { get; set; }
         [Required]

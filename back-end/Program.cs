@@ -8,9 +8,14 @@ using backend.Infrastructure.Services;
 using backend.Application.Auth.Handlers;
 using backend.Application.Interfaces;
 using backend.Infrastructure.Repositories;
+using backend.Infrastructure.Persistence;
 using backend.Application.interfaces;
 using backend.Domain.Models;
-
+using System.Reflection;
+using FluentValidation;
+using MediatR;
+using backend.Application.Common.Behaviors;
+using backend.Application.Stations.Handlers;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
 {
@@ -69,23 +74,39 @@ builder.Services.AddAuthentication(options =>
         }
     };
 });
-
+var perms = new List<Permission>
+    {
+        new Permission { Id = 1, Name = "CreateTicket" },
+        new Permission { Id = 2, Name = "ViewTickets" },
+        new Permission { Id = 3, Name = "ManageUsers" },
+        new Permission { Id = 4, Name = "ViewTrips" },
+        new Permission { Id = 5, Name = "ManageTrips" },
+        new Permission { Id = 6, Name = "ViewStations" },
+        new Permission { Id = 7, Name = "ManageStations" }
+    };
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("Invoice.Read", policy =>
-        policy.RequireClaim("permission", "Invoice.Read"));
-
-    options.AddPolicy("Invoice.Delete", policy =>
-        policy.RequireClaim("permission", "Invoice.Delete"));
-
-    options.AddPolicy("User.Manage", policy =>
-        policy.RequireClaim("permission", "User.Manage"));
+    foreach (var permission in perms)
+    {
+        options.AddPolicy(permission.Name, policy =>
+        {
+            policy.RequireClaim("Permission", permission.Name);
+        });
+    }
 });
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<LoginHandler>();
 builder.Services.AddScoped<RegisterHandler>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IStationRepository, StationRepository>();
 builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddMediatR(configuration =>
+{
+    configuration.RegisterServicesFromAssembly(typeof(CreateStationHandler).Assembly);
+});
+builder.Services.AddValidatorsFromAssembly(typeof(backend.Application.Stations.Commands.CreateStationCommand).Assembly);
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
 var app = builder.Build();
 
@@ -107,30 +128,28 @@ using (var scope = app.Services.CreateScope())
     if (!context.Users.Any())
     {
         var plannerRole = new Role { Id = 1, Name = "Planner" };
-        var managerRole = new Role { Id = 2, Name = "Manager" };
-        var clientRole = new Role { Id = 3, Name = "Client" };
+        var clientRole = new Role { Id = 2, Name = "Client" };
 
-        context.Roles.AddRange(plannerRole, managerRole, clientRole);
+        context.Roles.AddRange(plannerRole, clientRole);
 
         var planner = new User { Id = 1, Nom = "planner", Password = "$2a$11$J7cDcNsIlKGAaFWehF6NjuznMxilF91oxQ2dKWHl4ljNQK5kAT9FW", Email = "admin@example.com", CIN = "A15" };
-        var manager = new User { Id = 2, Nom = "manager", Password = "$2a$11$J7cDcNsIlKGAaFWehF6NjuznMxilF91oxQ2dKWHl4ljNQK5kAT9FW", Email = "manager@example.com", CIN = "A16" };
-        var user = new User { Id = 3, Nom = "user1", Password = "$2a$11$J7cDcNsIlKGAaFWehF6NjuznMxilF91oxQ2dKWHl4ljNQK5kAT9FW", Email = "user1@example.com", CIN = "A17" };
+        var user = new User { Id = 2, Nom = "user1", Password = "$2a$11$J7cDcNsIlKGAaFWehF6NjuznMxilF91oxQ2dKWHl4ljNQK5kAT9FW", Email = "user1@example.com", CIN = "A17" };
 
-        context.Users.AddRange(planner, manager, user);
+        context.Users.AddRange(planner, user);
 
         context.UserRoles.AddRange(
             new UserRole { UserId = 1, RoleId = 1 },
-            new UserRole { UserId = 2, RoleId = 2 },
-            new UserRole { UserId = 3, RoleId = 3 }
+            new UserRole { UserId = 2, RoleId = 2 }
         );
         var permissions = new List<Permission>
         {
-            new Permission { Id = 1, Name = "ViewUsers" },
-            new Permission { Id = 2, Name = "ManageUsers" },
-            new Permission { Id = 3, Name = "ViewTrips" },
-            new Permission { Id = 4, Name = "ManageTrips" },
-            new Permission { Id = 5, Name = "ViewStations" },
-            new Permission { Id = 6, Name = "ManageStations" }
+            new Permission { Id = 1, Name = "CreateTicket" },
+            new Permission { Id = 2, Name = "ViewTickets" },
+            new Permission { Id = 3, Name = "ManageUsers" },
+            new Permission { Id = 4, Name = "ViewTrips" },
+            new Permission { Id = 5, Name = "ManageTrips" },
+            new Permission { Id = 6, Name = "ViewStations" },
+            new Permission { Id = 7, Name = "ManageStations" }
         };
         context.Permissions.AddRange(permissions);
 
@@ -138,21 +157,16 @@ using (var scope = app.Services.CreateScope())
         var rolePermissions = new List<RolePermission>
         {
 
-            new RolePermission { RoleId = 1, PermissionId = 1 },
-            new RolePermission { RoleId = 1, PermissionId = 2 },
             new RolePermission { RoleId = 1, PermissionId = 3 },
             new RolePermission { RoleId = 1, PermissionId = 4 },
             new RolePermission { RoleId = 1, PermissionId = 5 },
             new RolePermission { RoleId = 1, PermissionId = 6 },
+            new RolePermission { RoleId = 1, PermissionId = 7 },
 
-
-            new RolePermission { RoleId = 2, PermissionId = 3 },
+            new RolePermission { RoleId = 2, PermissionId = 1 },
+            new RolePermission { RoleId = 2, PermissionId = 2 },
             new RolePermission { RoleId = 2, PermissionId = 4 },
-            new RolePermission { RoleId = 2, PermissionId = 5 },
-
-
-            new RolePermission { RoleId = 3, PermissionId = 3 },
-            new RolePermission { RoleId = 3, PermissionId = 5 }
+            new RolePermission { RoleId = 2, PermissionId = 6 }
         };
         context.RolePermissions.AddRange(rolePermissions);
 
