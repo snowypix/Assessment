@@ -1,8 +1,7 @@
 "use client";
 
 import type React from "react";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -38,12 +37,7 @@ interface Train {
 }
 
 export default function TrainsPage() {
-  const [trains, setTrains] = useState<Train[]>([
-    { code: 101, capacity: 200, type: "Express", status: "Active" },
-    { code: 102, capacity: 150, type: "Local", status: "Active" },
-    { code: 103, capacity: 300, type: "High-Speed", status: "Maintenance" },
-  ]);
-
+  const [trains, setTrains] = useState<Train[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTrain, setEditingTrain] = useState<Train | null>(null);
   const [formData, setFormData] = useState({
@@ -52,6 +46,24 @@ export default function TrainsPage() {
     type: "",
     status: "",
   });
+
+  // ✅ Fetch trains on mount
+  useEffect(() => {
+    fetchTrains();
+  }, []);
+
+  const fetchTrains = async () => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API}/api/Train`, {
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Failed to fetch trains");
+      const data = await res.json();
+      setTrains(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const handleAdd = () => {
     setEditingTrain(null);
@@ -70,27 +82,63 @@ export default function TrainsPage() {
     setIsDialogOpen(true);
   };
 
-  const handleDelete = (code: number) => {
-    setTrains(trains.filter((train) => train.code !== code));
+  const handleDelete = async (code: number) => {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API}/api/Train/${code}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
+      if (!res.ok) throw new Error("Failed to delete train");
+      setTrains(trains.filter((t) => t.code !== code));
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newTrain: Train = {
-      code: Number.parseInt(formData.code),
-      capacity: Number.parseInt(formData.capacity),
+      code: Number(formData.code),
+      capacity: Number(formData.capacity),
       type: formData.type,
       status: formData.status,
     };
 
-    if (editingTrain) {
-      setTrains(
-        trains.map((train) =>
-          train.code === editingTrain.code ? newTrain : train
-        )
-      );
-    } else {
-      setTrains([...trains, newTrain]);
+    try {
+      if (editingTrain) {
+        // ✅ Update train
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API}/api/Train/${editingTrain.code}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newTrain),
+            credentials: "include",
+          }
+        );
+        if (!res.ok) throw new Error("Failed to update train");
+
+        setTrains((prev) =>
+          prev.map((t) => (t.code === editingTrain.code ? newTrain : t))
+        );
+      } else {
+        // ✅ Create train
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API}/api/Train`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(newTrain),
+          credentials: "include",
+        });
+        if (!res.ok) throw new Error("Failed to create train");
+        const created = await res.json();
+
+        setTrains((prev) => [...prev, created]);
+      }
+    } catch (err) {
+      console.error(err);
     }
 
     setIsDialogOpen(false);
@@ -142,7 +190,9 @@ export default function TrainsPage() {
                         className={`px-2 py-1 rounded-full text-xs font-medium ${
                           train.status === "Active"
                             ? "bg-green-100 text-green-800"
-                            : "bg-yellow-100 text-yellow-800"
+                            : train.status === "Maintenance"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : "bg-gray-200 text-gray-700"
                         }`}
                       >
                         {train.status}
@@ -174,6 +224,7 @@ export default function TrainsPage() {
           </CardContent>
         </Card>
 
+        {/* Dialog */}
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent>
             <DialogHeader>
