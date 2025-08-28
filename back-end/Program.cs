@@ -101,6 +101,7 @@ builder.Services.AddScoped<RegisterHandler>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IStationRepository, StationRepository>();
 builder.Services.AddScoped<ITrainRepository, TrainRepository>();
+builder.Services.AddScoped<ITripRepository, TripRepository>();
 
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddMediatR(configuration =>

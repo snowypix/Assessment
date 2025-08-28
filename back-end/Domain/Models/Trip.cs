@@ -13,6 +13,26 @@ namespace backend.Domain.Models
         public Trip()
         {
         }
+        public Trip(DateTime departureDate, DateInterval duration, DateInterval delay, string status, int price, int departureStationId, int arrivalStationId, int trainId)
+        {
+            DepartureDate = departureDate;
+            Duration = duration;
+            Delay = delay;
+            Status = status;
+            Price = price;
+            DepartureStationId = departureStationId;
+            ArrivalStationId = arrivalStationId;
+            TrainId = trainId;
+        }
+        public void Update(DateTime departureDate, DateInterval duration, DateInterval delay, string status, int price, int trainId)
+        {
+            DepartureDate = departureDate;
+            Duration = duration;
+            Delay = delay;
+            Status = status;
+            Price = price;
+            TrainId = trainId;
+        }
         [Key]
         public int Code { get; set; }
         [Required]
