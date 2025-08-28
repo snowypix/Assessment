@@ -1,8 +1,7 @@
 "use client";
 
 import type React from "react";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -29,19 +28,27 @@ interface Station {
 }
 
 export default function StationsPage() {
-  const [stations, setStations] = useState<Station[]>([
-    { code: 1001, name: "Central Station" },
-    { code: 1002, name: "North Terminal" },
-    { code: 1003, name: "South Junction" },
-    { code: 1004, name: "East Plaza" },
-  ]);
-
+  const [stations, setStations] = useState<Station[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingStation, setEditingStation] = useState<Station | null>(null);
-  const [formData, setFormData] = useState({
-    code: "",
-    name: "",
-  });
+  const [formData, setFormData] = useState({ code: "", name: "" });
+
+  useEffect(() => {
+    fetchStations();
+  }, []);
+
+  const fetchStations = async () => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API}/api/Station`, {
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Failed to fetch stations");
+      const data = await res.json();
+      setStations(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const handleAdd = () => {
     setEditingStation(null);
@@ -58,25 +65,59 @@ export default function StationsPage() {
     setIsDialogOpen(true);
   };
 
-  const handleDelete = (code: number) => {
-    setStations(stations.filter((station) => station.code !== code));
+  const handleDelete = async (code: number) => {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API}/api/Station/${code}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
+      if (!res.ok) throw new Error("Failed to delete station");
+      setStations(stations.filter((s) => s.code !== code));
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newStation: Station = {
-      code: Number.parseInt(formData.code),
+      code: Number(formData.code),
       name: formData.name,
     };
 
-    if (editingStation) {
-      setStations(
-        stations.map((station) =>
-          station.code === editingStation.code ? newStation : station
-        )
-      );
-    } else {
-      setStations([...stations, newStation]);
+    try {
+      if (editingStation) {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API}/api/Station/${editingStation.code}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newStation),
+            credentials: "include",
+          }
+        );
+        if (!res.ok) throw new Error("Failed to update station");
+
+        setStations((prev) =>
+          prev.map((s) => (s.code === editingStation.code ? newStation : s))
+        );
+      } else {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API}/api/Station`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(newStation),
+          credentials: "include",
+        });
+        if (!res.ok) throw new Error("Failed to create station");
+        const created = await res.json();
+
+        setStations((prev) => [...prev, created]);
+      }
+    } catch (err) {
+      console.error(err);
     }
 
     setIsDialogOpen(false);
@@ -148,6 +189,7 @@ export default function StationsPage() {
           </CardContent>
         </Card>
 
+        {/* Dialog */}
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent>
             <DialogHeader>
