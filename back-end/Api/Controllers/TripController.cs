@@ -52,5 +52,17 @@ namespace backend.Api.Controllers
             var success = await _mediator.Send(new DeleteTripCommand(id));
             return success ? NoContent() : NotFound();
         }
+        [HttpGet("check-schedules")]
+        public async Task<ActionResult<IEnumerable<Trip>>> CheckSchedules(
+    [FromQuery] int departureStationId,
+    [FromQuery] int arrivalStationId,
+    [FromQuery] DateTime departureTime)
+        {
+            var query = new CheckSchedulesQuery(departureStationId, arrivalStationId, departureTime);
+            var trips = await _mediator.Send(query);
+
+            return Ok(trips);
+        }
+
     }
 }

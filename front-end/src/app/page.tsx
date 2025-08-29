@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,8 +10,66 @@ import {
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Clock, MapPin, Train, Users, Shield, Zap } from "lucide-react";
+import { useEffect, useState } from "react";
+type Schedule = {
+  id: number;
+  departureDate: string; // ISO string
+  departureStationId: number;
+  arrivalStationId: number;
+  trainType: string;
+};
 
+type Station = {
+  code: number;
+  name: string;
+};
 export default function HomePage() {
+  const [stations, setStations] = useState<Station[]>([]);
+  const [schedules, setSchedules] = useState<Schedule[]>([]);
+  const [loading, setLoading] = useState(false);
+  // instead of names, track station IDs
+  const [departureId, setDepartureId] = useState<number | "">("");
+  const [arrivalId, setArrivalId] = useState<number | "">("");
+  const [date, setDate] = useState("");
+
+  useEffect(() => {
+    async function fetchStations() {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API}/api/Station`);
+        if (!res.ok) throw new Error("Failed to fetch stations");
+        const data = await res.json();
+        setStations(data);
+      } catch (error) {
+        console.error("Error fetching stations:", error);
+      }
+    }
+    fetchStations();
+  }, []);
+  async function fetchSchedules() {
+    try {
+      setLoading(true);
+
+      const params = new URLSearchParams({
+        departureStationId: departureId?.toString() || "",
+        arrivalStationId: arrivalId?.toString() || "",
+        time: date,
+      });
+
+      const res = await fetch(
+        `${
+          process.env.NEXT_PUBLIC_API
+        }/api/Trip/check-schedules?${params.toString()}`
+      );
+
+      if (!res.ok) throw new Error("Failed to fetch schedules");
+      const data = await res.json();
+      setSchedules(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  }
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -48,145 +107,150 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* Hero Section */}
+      {/* Hero Section with Search */}
       <section className="py-16 px-4">
         <div className="container mx-auto max-w-4xl text-center">
-          <h1 className="text-4xl md:text-6xl font-bold text-balance mb-6">
+          <h1 className="text-4xl md:text-6xl font-bold mb-6">
             Your Journey Starts Here
           </h1>
-          <p className="text-xl text-muted-foreground text-balance mb-8 max-w-2xl mx-auto">
-            Find train schedules, book tickets, and travel with confidence
-            across the country. Fast, reliable, and always on time.
-          </p>
 
           {/* Search Form */}
           <Card className="max-w-2xl mx-auto">
             <CardContent className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">
-                    From
-                  </label>
-                  <Input placeholder="Departure station" className="bg-input" />
+                  <label className="text-sm font-medium">From</label>
+                  <select
+                    className="w-full rounded-md border px-3 py-2 bg-input"
+                    value={departureId}
+                    onChange={(e) =>
+                      setDepartureId(
+                        e.target.value ? Number(e.target.value) : ""
+                      )
+                    }
+                  >
+                    <option value="">Select station</option>
+                    {stations.map((s) => (
+                      <option
+                        key={s.code}
+                        value={s.code}
+                        disabled={s.code === arrivalId}
+                      >
+                        {s.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">
-                    To
-                  </label>
-                  <Input placeholder="Arrival station" className="bg-input" />
+                  <label className="text-sm font-medium">To</label>
+                  <select
+                    className="w-full rounded-md border px-3 py-2 bg-input"
+                    value={arrivalId}
+                    onChange={(e) =>
+                      setArrivalId(e.target.value ? Number(e.target.value) : "")
+                    }
+                  >
+                    <option value="">Select station</option>
+                    {stations.map((s) => (
+                      <option
+                        key={s.code}
+                        value={s.code}
+                        disabled={s.code === departureId}
+                      >
+                        {s.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">
-                    Date
-                  </label>
-                  <Input type="date" className="bg-input" />
+                  <label className="text-sm font-medium">Date</label>
+                  <Input
+                    type="date"
+                    className="bg-input"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                  />
                 </div>
               </div>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Button className="flex-1" size="lg">
-                  <Clock className="mr-2 h-4 w-4" />
-                  Check Schedules
-                </Button>
-                <Button
-                  variant="outline"
-                  className="flex-1 bg-transparent"
-                  size="lg"
-                >
-                  <MapPin className="mr-2 h-4 w-4" />
-                  Book Tickets
-                </Button>
-              </div>
+              <Button
+                className="w-full"
+                size="lg"
+                onClick={fetchSchedules}
+                disabled={loading}
+              >
+                <Clock className="mr-2 h-4 w-4" />
+                {loading ? "Loading..." : "Check Schedules"}
+              </Button>
             </CardContent>
           </Card>
         </div>
       </section>
 
       {/* Upcoming Departures */}
-      <section className="py-12 px-4 bg-muted/30">
+      <section className="py-12 px-4 bg-muted/30" id="schedules">
         <div className="container mx-auto max-w-6xl">
           <h2 className="text-3xl font-bold text-center mb-8">
             Upcoming Departures
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              {
-                route: "New York → Boston",
-                time: "08:30 AM",
-                duration: "3h 45m",
-                price: "$89",
-                status: "On Time",
-              },
-              {
-                route: "Chicago → Detroit",
-                time: "09:15 AM",
-                duration: "5h 20m",
-                price: "$67",
-                status: "Delayed 10min",
-              },
-              {
-                route: "Los Angeles → San Francisco",
-                time: "10:00 AM",
-                duration: "12h 15m",
-                price: "$156",
-                status: "On Time",
-              },
-              {
-                route: "Miami → Orlando",
-                time: "11:30 AM",
-                duration: "5h 30m",
-                price: "$78",
-                status: "On Time",
-              },
-              {
-                route: "Seattle → Portland",
-                time: "12:45 PM",
-                duration: "3h 30m",
-                price: "$45",
-                status: "On Time",
-              },
-              {
-                route: "Washington DC → Philadelphia",
-                time: "02:15 PM",
-                duration: "1h 45m",
-                price: "$34",
-                status: "On Time",
-              },
-            ].map((departure, index) => (
-              <Card key={index} className="hover:shadow-md transition-shadow">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">{departure.route}</CardTitle>
-                    <Badge
-                      variant={
-                        departure.status === "On Time"
-                          ? "default"
-                          : "destructive"
-                      }
-                    >
-                      {departure.status}
-                    </Badge>
-                  </div>
-                  <CardDescription className="text-2xl font-bold text-primary">
-                    {departure.time}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between text-sm text-muted-foreground mb-3">
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
-                      {departure.duration}
-                    </span>
-                    <span className="font-semibold text-foreground">
-                      {departure.price}
-                    </span>
-                  </div>
-                  <Button className="w-full" size="sm">
-                    Book Now
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+
+          {loading ? (
+            <p className="text-center text-muted-foreground">
+              Fetching schedules...
+            </p>
+          ) : schedules.length === 0 ? (
+            <p className="text-center text-muted-foreground">
+              No trips available. Try searching above.
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {schedules.map((trip) => {
+                const departureTime = new Date(trip.departureDate);
+                const formattedTime = departureTime.toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                });
+
+                const formattedDate = departureTime.toLocaleDateString([], {
+                  weekday: "short",
+                  month: "short",
+                  day: "numeric",
+                });
+
+                return (
+                  <Card
+                    key={trip.id}
+                    className="hover:shadow-md transition-shadow"
+                  >
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-lg">
+                          {stations[0].name} → {stations[1].name}
+                        </CardTitle>
+                        <Badge variant="default">{trip.trainType}</Badge>
+                      </div>
+                      <CardDescription className="text-xl font-bold text-primary">
+                        {formattedTime}{" "}
+                        <span className="text-sm">({formattedDate})</span>
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center justify-between text-sm text-muted-foreground mb-3">
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-4 w-4" /> Departure
+                        </span>
+                        <span className="font-semibold text-foreground">
+                          #{trip.id}
+                        </span>
+                      </div>
+                      <Button className="w-full" size="sm">
+                        Book Now
+                      </Button>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
         </div>
       </section>
 

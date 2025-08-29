@@ -11,10 +11,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Train } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 export default function SignInPage() {
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect") || "/";
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -44,7 +46,7 @@ export default function SignInPage() {
         throw new Error(data.message || "Login failed");
       }
 
-      router.push("/");
+      router.push(redirect);
     } catch (err: any) {
       setError(err.message || "Something went wrong");
     } finally {

@@ -1,3 +1,4 @@
+using back_end.Application.DTOs;
 using backend.Application.Interfaces;
 using backend.Domain.Models;
 using backend.Infrastructure.Persistence;
@@ -34,7 +35,23 @@ namespace backend.Infrastructure.Repositories
             _db.Trips.Remove(Trip);
             return Task.CompletedTask;
         }
-
+        public async Task<IEnumerable<TripScheduleDTO>> GetSchedules(int departureStationId, int arrivalStationId, DateTime time, CancellationToken ct)
+        {
+            return await _db.Trips
+                .Where(t =>
+                    t.DepartureStationId == departureStationId &&
+                    t.ArrivalStationId == arrivalStationId &&
+                    t.DepartureDate >= time
+                )
+                .Select(t => new TripScheduleDTO(
+                    t.Code,
+                    t.DepartureDate,
+                    t.DepartureStationId,
+                    t.ArrivalStationId,
+                    t.Train.Type
+                ))
+                .ToListAsync(ct);
+        }
         public async Task SaveChangesAsync()
             => await _db.SaveChangesAsync();
     }
