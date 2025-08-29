@@ -58,6 +58,7 @@ export default function TripsPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTrip, setEditingTrip] = useState<Trip | null>(null);
   const [refetch, setRefetch] = useState(0);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     code: "",
     departureDate: "",
@@ -189,11 +190,25 @@ export default function TripsPage() {
             credentials: "include",
           }
         );
-        if (!res.ok) throw new Error("Failed to update trip");
+        const data = await res.json();
+
+        if (!res.ok) {
+          if (data?.Errors) {
+            const messages = Object.values(data.Errors).flat().join("\n");
+            setErrorMessage(messages);
+          } else if (data?.message) {
+            setErrorMessage(data.message);
+          } else {
+            setErrorMessage("Failed to create trip.");
+          }
+          return;
+        }
         setTrips((prev) =>
           prev.map((t) => (t.code === editingTrip.code ? newTrip : t))
         );
         setRefetch((prev) => prev + 1);
+        setErrorMessage(null);
+        setIsDialogOpen(false);
       } else {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API}/api/Trip`, {
           method: "POST",
@@ -201,15 +216,28 @@ export default function TripsPage() {
           body: JSON.stringify(newTrip),
           credentials: "include",
         });
-        if (!res.ok) throw new Error("Failed to create trip");
+        const data = await res.json();
+
+        if (!res.ok) {
+          if (data?.Errors) {
+            const messages = Object.values(data.Errors).flat().join("\n");
+            setErrorMessage(messages);
+          } else if (data?.message) {
+            setErrorMessage(data.message);
+          } else {
+            setErrorMessage("Failed to create trip.");
+          }
+          return;
+        }
         const created = await res.json();
         setTrips((prev) => [...prev, created]);
         setRefetch((prev) => prev + 1);
+        setErrorMessage(null);
+        setIsDialogOpen(false);
       }
     } catch (err) {
-      console.error(err);
+      setErrorMessage(err.message || "Unexpected error");
     }
-    setIsDialogOpen(false);
   };
 
   // ✅ Helpers to display names
@@ -489,11 +517,19 @@ export default function TripsPage() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => setIsDialogOpen(false)}
+                  onClick={() => {
+                    setIsDialogOpen(false);
+                    setErrorMessage(null);
+                  }}
                 >
                   Cancel
                 </Button>
               </div>
+              {errorMessage && (
+                <div className="text-red-600 mb-2 whitespace-pre-line">
+                  {errorMessage}
+                </div>
+              )}
             </form>
           </DialogContent>
         </Dialog>
