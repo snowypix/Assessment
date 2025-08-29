@@ -16,7 +16,7 @@ namespace backend.Application.Trips.Handlers
             var trip = await _repo.GetByIdAsync(request.Code);
             if (trip == null) return null;
 
-            trip.Update(request.departureDate, request.duration, request.delay, request.status, request.price, request.trainId);
+            trip.Update(request.departureDate, request.duration, request.delay, request.status, request.price, request.trainId, request.departureStationId, request.arrivalStationId);
             await _repo.UpdateAsync(trip);
             await _repo.SaveChangesAsync();
 

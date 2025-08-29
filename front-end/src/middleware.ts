@@ -25,7 +25,6 @@ export async function middleware(req: NextRequest) {
 
     try {
         const decoded = jwt.decode(token) as { role?: string };
-        console.log(decoded);
 
         const claims = normalizeClaims(decoded);
 

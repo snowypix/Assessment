@@ -24,7 +24,7 @@ namespace backend.Domain.Models
             ArrivalStationId = arrivalStationId;
             TrainId = trainId;
         }
-        public void Update(DateTime departureDate, DateInterval duration, DateInterval delay, string status, int price, int trainId)
+        public void Update(DateTime departureDate, DateInterval duration, DateInterval delay, string status, int price, int trainId, int departureStationId, int arrivalStationId)
         {
             DepartureDate = departureDate;
             Duration = duration;
@@ -32,6 +32,8 @@ namespace backend.Domain.Models
             Status = status;
             Price = price;
             TrainId = trainId;
+            ArrivalStationId = arrivalStationId;
+            DepartureStationId = departureStationId;
         }
         [Key]
         public int Code { get; set; }
