@@ -16,6 +16,7 @@ using FluentValidation;
 using MediatR;
 using backend.Application.Common.Behaviors;
 using backend.Application.Stations.Handlers;
+using back_end.Application.DTOs;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
 {
@@ -108,15 +109,10 @@ builder.Services.AddMediatR(configuration =>
 {
     configuration.RegisterServicesFromAssembly(typeof(CreateTrainHandler).Assembly);
 });
-// builder.Services.AddMediatR(cfg =>
-// cfg.RegisterServicesFromAssembly(typeof(QueriesHandler).Assembly));
-foreach (var service in builder.Services.Where(s => s.ServiceType.Name.Contains("Handler")))
-{
-    Console.WriteLine($"[MediatR] Registered handler: {service.ServiceType}");
-}
-builder.Services.AddValidatorsFromAssembly(typeof(backend.Application.Stations.Commands.CreateStationCommand).Assembly);
-builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+
+builder.Services.AddValidatorsFromAssembly(
+    typeof(backend.Application.Trips.Validators.CheckSchedulesQueryValidator).Assembly
+); builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
 var app = builder.Build();
 

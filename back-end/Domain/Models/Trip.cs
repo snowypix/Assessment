@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
+using AccountService.Exceptions;
 using Microsoft.VisualBasic;
 namespace backend.Domain.Models
 {
@@ -15,6 +16,9 @@ namespace backend.Domain.Models
         }
         public Trip(DateTime departureDate, DateInterval duration, DateInterval delay, string status, int price, int departureStationId, int arrivalStationId, int trainId)
         {
+            if (DepartureStationId == arrivalStationId)
+                throw new BusinessRuleException("Source and destination stations cannot be the same.");
+
             DepartureDate = departureDate;
             Duration = duration;
             Delay = delay;
@@ -26,6 +30,9 @@ namespace backend.Domain.Models
         }
         public void Update(DateTime departureDate, DateInterval duration, DateInterval delay, string status, int price, int trainId, int departureStationId, int arrivalStationId)
         {
+            if (DepartureStationId == arrivalStationId)
+                throw new BusinessRuleException("Source and destination stations cannot be the same.");
+
             DepartureDate = departureDate;
             Duration = duration;
             Delay = delay;

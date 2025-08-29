@@ -1,4 +1,7 @@
-﻿using AccountService.Exceptions;
+﻿using System.Net;
+using System.Text.Json;
+using AccountService.Exceptions;
+using FluentValidation;
 
 public class ExceptionHandlingMiddleware
 {
@@ -21,6 +24,22 @@ public class ExceptionHandlingMiddleware
         {
             context.Response.StatusCode = 400;
             await context.Response.WriteAsJsonAsync(new { error = ex.Message });
+        }
+        catch (ValidationException ex)
+        {
+            context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+            context.Response.ContentType = "application/json";
+
+            var errors = ex.Errors
+                .GroupBy(e => e.PropertyName)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Select(e => e.ErrorMessage).ToArray()
+                );
+
+            var response = new { Errors = errors };
+
+            await context.Response.WriteAsync(JsonSerializer.Serialize(response));
         }
         catch (Exception ex)
         {
