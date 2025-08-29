@@ -25,7 +25,7 @@ export async function clientMiddleware(req: NextRequest) {
         loginUrl.searchParams.set("redirect", pathname + search);
 
         const res = NextResponse.redirect(loginUrl);
-        res.cookies.set("auth_token", "", { maxAge: 0 }); // clear cookie
+        res.cookies.set("auth_token", "", { maxAge: 0 });
         return res;
     }
 

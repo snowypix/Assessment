@@ -16,7 +16,7 @@ namespace backend.Api.Controllers
         private readonly IMediator _mediator;
 
         public TrainController(IMediator mediator) => _mediator = mediator;
-
+        [Authorize(Policy = "ManageTrains")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Train>>> GetAll()
             => Ok(await _mediator.Send(new GetAllTrainsQuery()));

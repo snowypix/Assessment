@@ -57,6 +57,7 @@ export default function TripsPage() {
   const [trains, setTrains] = useState<Train[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTrip, setEditingTrip] = useState<Trip | null>(null);
+  const [refetch, setRefetch] = useState(0);
   const [formData, setFormData] = useState({
     code: "",
     departureDate: "",
@@ -69,12 +70,11 @@ export default function TripsPage() {
     trainId: "",
   });
 
-  // ✅ Fetch trips, stations, trains
   useEffect(() => {
     fetchTrips();
     fetchStations();
     fetchTrains();
-  }, []);
+  }, [refetch]);
 
   const fetchTrips = async () => {
     try {
@@ -193,6 +193,7 @@ export default function TripsPage() {
         setTrips((prev) =>
           prev.map((t) => (t.code === editingTrip.code ? newTrip : t))
         );
+        setRefetch((prev) => prev + 1);
       } else {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API}/api/Trip`, {
           method: "POST",
@@ -203,6 +204,7 @@ export default function TripsPage() {
         if (!res.ok) throw new Error("Failed to create trip");
         const created = await res.json();
         setTrips((prev) => [...prev, created]);
+        setRefetch((prev) => prev + 1);
       }
     } catch (err) {
       console.error(err);
@@ -373,13 +375,22 @@ export default function TripsPage() {
                     <SelectValue placeholder="Select departure station" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem key="0" value="Select">
+                      Select a station
+                    </SelectItem>
                     {stations.length === 0 ? (
                       <SelectItem value="" disabled>
                         Loading...
                       </SelectItem>
                     ) : (
                       stations.map((s) => (
-                        <SelectItem key={s.code} value={s.code.toString()}>
+                        <SelectItem
+                          key={s.code}
+                          value={s.code.toString()}
+                          disabled={
+                            s.code === Number(formData.arrivalStationId)
+                          }
+                        >
                           {s.name}
                         </SelectItem>
                       ))
@@ -401,13 +412,22 @@ export default function TripsPage() {
                     <SelectValue placeholder="Select arrival station" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem key="0" value="Select">
+                      Select a station
+                    </SelectItem>
                     {stations.length === 0 ? (
                       <SelectItem value="" disabled>
                         Loading...
                       </SelectItem>
                     ) : (
                       stations.map((s) => (
-                        <SelectItem key={s.code} value={s.code.toString()}>
+                        <SelectItem
+                          key={s.code}
+                          value={s.code.toString()}
+                          disabled={
+                            s.code === Number(formData.arrivalStationId)
+                          }
+                        >
                           {s.name}
                         </SelectItem>
                       ))

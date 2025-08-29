@@ -19,11 +19,13 @@ export async function adminMiddleware(req: NextRequest) {
     const { pathname, search } = req.nextUrl;
 
     if (!isValid || !token) {
+
         const loginUrl = new URL("/login", req.url);
         loginUrl.searchParams.set("redirect", pathname + search);
 
         const res = NextResponse.redirect(loginUrl);
         res.cookies.set("auth_token", "", { maxAge: 0 });
+        return res;
     }
 
     try {

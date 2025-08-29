@@ -13,6 +13,9 @@ namespace backend.Application.Trips.Validators
 
             RuleFor(x => x.ArrivalStationId)
                 .GreaterThan(0).WithMessage("Arrival station must be valid.");
+            RuleFor(x => x.DepartureTime)
+     .GreaterThan(_ => DateTime.UtcNow)
+     .WithMessage("Trip already started.");
         }
     }
 }

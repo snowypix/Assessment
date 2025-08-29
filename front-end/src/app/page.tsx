@@ -52,7 +52,7 @@ export default function HomePage() {
       const params = new URLSearchParams({
         departureStationId: departureId?.toString() || "",
         arrivalStationId: arrivalId?.toString() || "",
-        time: date,
+        departureTime: date,
       });
 
       const res = await fetch(
