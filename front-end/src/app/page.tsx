@@ -37,9 +37,6 @@ interface User {
 }
 
 export default function HomePage() {
-  localStorage.removeItem("departure");
-  localStorage.removeItem("arrival");
-  localStorage.removeItem("selectedTrip");
   const router = useRouter();
   const [stations, setStations] = useState<Station[]>([]);
   const [schedules, setSchedules] = useState<Schedule[]>([]);
@@ -49,6 +46,9 @@ export default function HomePage() {
   const [user, setUser] = useState<User | null>(null);
   const [date, setDate] = useState("");
   useEffect(() => {
+    localStorage.removeItem("departure");
+    localStorage.removeItem("arrival");
+    localStorage.removeItem("selectedTrip");
     fetch(`${process.env.NEXT_PUBLIC_API}/api/auth/me`, {
       credentials: "include",
     })
