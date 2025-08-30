@@ -52,6 +52,21 @@ public class AuthController : ControllerBase
         var user = await _registerHandler.Handle(new RegisterCommand(dto.Email, dto.Password, dto.Nom, dto.CIN), ct);
         return Ok(new { user.Id, user.Nom, user.Email });
     }
+    [HttpGet("logout")]
+    public IActionResult Logout()
+    {
+        Response.Cookies.Append("auth_token", "", new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.UtcNow.AddDays(-1),
+            Path = "/"
+        });
+
+        return Ok(new { message = "Logout successful" });
+    }
+
 
     [HttpGet("me")]
     [Authorize(AuthenticationSchemes = "Bearer")]

@@ -28,6 +28,14 @@ type Station = {
   code: number;
   name: string;
 };
+
+interface User {
+  userId: number;
+  username: string;
+  roles: string[];
+  permissions: string[];
+}
+
 export default function HomePage() {
   const router = useRouter();
   const [stations, setStations] = useState<Station[]>([]);
@@ -36,8 +44,16 @@ export default function HomePage() {
   // instead of names, track station IDs
   const [departureId, setDepartureId] = useState<number | "">("");
   const [arrivalId, setArrivalId] = useState<number | "">("");
+  const [user, setUser] = useState<User | null>(null);
   const [date, setDate] = useState("");
-
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API}/api/auth/me`, {
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then((data) => setUser(data))
+      .catch((err) => console.log(err));
+  }, []);
   useEffect(() => {
     async function fetchStations() {
       try {
@@ -87,27 +103,37 @@ export default function HomePage() {
               <span className="text-2xl font-bold">RailTime</span>
             </div>
             <nav className="hidden md:flex items-center gap-6">
-              <a
-                href="#schedules"
-                className="text-foreground hover:text-primary transition-colors"
-              >
-                Schedules
-              </a>
-              <a
-                href="#booking"
-                className="text-foreground hover:text-primary transition-colors"
-              >
-                Book Tickets
-              </a>
-              <a
-                href="#travel-info"
-                className="text-foreground hover:text-primary transition-colors"
-              >
-                Travel Info
-              </a>
-              <Button variant="outline" size="sm" asChild>
-                <a href="/login">Sign In</a>
-              </Button>
+              {user?.roles?.[0] === "Planner" && (
+                <Button size="sm" asChild>
+                  <a href="/admin">Admin panel</a>
+                </Button>
+              )}
+
+              {user ? (
+                <span className="font-semibold">Hello, {user.username}</span>
+              ) : (
+                <Button variant="outline" size="sm" asChild>
+                  <a href="/login">Sign In</a>
+                </Button>
+              )}
+              {user && (
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={async () => {
+                    await fetch(
+                      `${process.env.NEXT_PUBLIC_API}/api/auth/logout`,
+                      {
+                        credentials: "include",
+                      }
+                    );
+                    setUser(null);
+                    window.location.reload();
+                  }}
+                >
+                  Logout
+                </Button>
+              )}
             </nav>
           </div>
         </div>
