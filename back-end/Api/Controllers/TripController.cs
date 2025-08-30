@@ -20,7 +20,6 @@ namespace backend.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Trip>>> GetAll()
             => Ok(await _mediator.Send(new GetAllTripsQuery()));
-        [Authorize(Policy = "ManageTrips")]
         [HttpGet("{id}")]
         public async Task<ActionResult<Trip>> GetById(int id)
         {
@@ -58,6 +57,7 @@ namespace backend.Api.Controllers
     [FromQuery] int arrivalStationId,
     [FromQuery] DateTime departureTime)
         {
+            Console.WriteLine(departureTime.ToString() + " " + DateTime.Now.ToString());
             var query = new CheckSchedulesQuery(departureStationId, arrivalStationId, departureTime);
             var trips = await _mediator.Send(query);
 

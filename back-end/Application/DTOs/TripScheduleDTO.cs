@@ -1,3 +1,5 @@
+using Microsoft.VisualBasic;
+
 namespace back_end.Application.DTOs
 {
     public record TripScheduleDTO(
@@ -5,7 +7,10 @@ namespace back_end.Application.DTOs
     DateTime DepartureDate,
     int DepartureStationId,
     int ArrivalStationId,
-    string TrainType
+    string TrainType,
+    int Price,
+    DateInterval Duration,
+    DateInterval Delay
     );
 
 }

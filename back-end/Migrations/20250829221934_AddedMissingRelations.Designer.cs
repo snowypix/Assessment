@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using backend.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using backend.Infrastructure.Persistence;
 namespace back_end.Migrations
 {
     [DbContext(typeof(AppDbcontext))]
-    partial class AppDbcontextModelSnapshot : ModelSnapshot
+    [Migration("20250829221934_AddedMissingRelations")]
+    partial class AddedMissingRelations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -104,13 +107,10 @@ namespace back_end.Migrations
                     b.Property<int>("ClientId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Price")
-                        .HasColumnType("int");
-
                     b.Property<string>("QrCode")
                         .IsRequired()
-                        .HasMaxLength(144)
-                        .HasColumnType("varchar(144)");
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)");
 
                     b.Property<int>("TripId")
                         .HasColumnType("int");
@@ -118,8 +118,6 @@ namespace back_end.Migrations
                     b.HasKey("Code");
 
                     b.HasIndex("ClientId");
-
-                    b.HasIndex("TripId");
 
                     b.ToTable("Tickets");
                 });
@@ -261,15 +259,15 @@ namespace back_end.Migrations
 
             modelBuilder.Entity("backend.Domain.Models.Ticket", b =>
                 {
-                    b.HasOne("backend.Domain.Models.User", "Client")
+                    b.HasOne("backend.Domain.Models.Trip", "Trip")
                         .WithMany("Tickets")
                         .HasForeignKey("ClientId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("backend.Domain.Models.Trip", "Trip")
+                    b.HasOne("backend.Domain.Models.User", "Client")
                         .WithMany("Tickets")
-                        .HasForeignKey("TripId")
+                        .HasForeignKey("ClientId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 

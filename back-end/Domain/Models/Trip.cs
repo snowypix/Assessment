@@ -67,5 +67,6 @@ namespace backend.Domain.Models
         [Required]
         public Train Train { get; set; }
         public int TrainId { get; set; }
+        public ICollection<Ticket> Tickets { get; set; }
     }
 }

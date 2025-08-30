@@ -17,6 +17,8 @@ using MediatR;
 using backend.Application.Common.Behaviors;
 using backend.Application.Stations.Handlers;
 using back_end.Application.DTOs;
+using backend.Application.Abstractions;
+using backend.Infrastructure.Security;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
 {
@@ -96,6 +98,8 @@ builder.Services.AddAuthorization(options =>
         });
     }
 });
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<LoginHandler>();
 builder.Services.AddScoped<RegisterHandler>();
@@ -103,6 +107,11 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IStationRepository, StationRepository>();
 builder.Services.AddScoped<ITrainRepository, TrainRepository>();
 builder.Services.AddScoped<ITripRepository, TripRepository>();
+builder.Services.AddScoped<ITicketRepository, TicketRepository>();
+builder.Services.Configure<QrCryptoOptions>(
+    builder.Configuration.GetSection("QrCrypto"));
+
+builder.Services.AddScoped<IEncryptedQrGenerator, EncryptedQrGenerator>();
 
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddMediatR(configuration =>

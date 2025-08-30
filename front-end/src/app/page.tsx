@@ -11,12 +11,15 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Clock, MapPin, Train, Users, Shield, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 type Schedule = {
   id: number;
   departureDate: string; // ISO string
   departureStationId: number;
   arrivalStationId: number;
   trainType: string;
+  price: string;
+  duration: Date;
 };
 
 type Station = {
@@ -24,6 +27,7 @@ type Station = {
   name: string;
 };
 export default function HomePage() {
+  const router = useRouter();
   const [stations, setStations] = useState<Station[]>([]);
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [loading, setLoading] = useState(false);
@@ -242,7 +246,25 @@ export default function HomePage() {
                           #{trip.id}
                         </span>
                       </div>
-                      <Button className="w-full" size="sm">
+                      <Button
+                        className="w-full"
+                        size="sm"
+                        onClick={() => {
+                          localStorage.setItem(
+                            "selectedTrip",
+                            JSON.stringify(trip)
+                          );
+                          localStorage.setItem(
+                            "departure",
+                            JSON.stringify(stations[0].name)
+                          );
+                          localStorage.setItem(
+                            "arrival",
+                            JSON.stringify(stations[1].name)
+                          );
+                          router.push(`tickets/${trip.id}`);
+                        }}
+                      >
                         Book Now
                       </Button>
                     </CardContent>

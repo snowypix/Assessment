@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
+using AccountService.Exceptions;
 namespace backend.Domain.Models
 {
 
@@ -12,6 +13,27 @@ namespace backend.Domain.Models
 
         public Ticket()
         {
+        }
+        public void CalculatePrice()
+        {
+            if (Class == 1)
+            {
+                Price = (int)Math.Ceiling(Trip.Price * 1.5);
+                return;
+            }
+            Price = Trip.Price;
+        }
+        public void AttachQrCode(string encryptedQr)
+        {
+            Console.WriteLine(encryptedQr.Length);
+            if (encryptedQr.Length > 144)
+            {
+                throw new BusinessRuleException("QR too long");
+            }
+            if (string.IsNullOrWhiteSpace(encryptedQr))
+                throw new BusinessRuleException("QR cannot be empty");
+
+            QrCode = encryptedQr;
         }
         [Key]
         public int Code { get; set; }
@@ -22,5 +44,9 @@ namespace backend.Domain.Models
         [Required]
         public User Client { get; set; }
         public int ClientId { get; set; }
+        [Required]
+        public Trip Trip { get; set; }
+        public int TripId { get; set; }
+        public int Price { get; set; }
     }
 }

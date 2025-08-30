@@ -48,7 +48,10 @@ namespace backend.Infrastructure.Repositories
                     t.DepartureDate,
                     t.DepartureStationId,
                     t.ArrivalStationId,
-                    t.Train.Type
+                    t.Train.Type,
+                    t.Price,
+                    t.Duration,
+                    t.Delay
                 ))
                 .ToListAsync(ct);
         }

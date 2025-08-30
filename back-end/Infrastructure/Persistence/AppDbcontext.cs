@@ -96,8 +96,10 @@ namespace backend.Infrastructure.Persistence
                 .HasMaxLength(20);
             // Ticket
             modelBuilder.Entity<Ticket>().HasKey(t => t.Code);
-            modelBuilder.Entity<Ticket>().Property(t => t.QrCode).HasMaxLength(30);
+            modelBuilder.Entity<Ticket>().Property(t => t.QrCode).HasMaxLength(144);
             modelBuilder.Entity<Ticket>().HasOne(t => t.Client).WithMany(u => u.Tickets).HasForeignKey(t => t.ClientId).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Ticket>().HasOne(t => t.Trip).WithMany(u => u.Tickets).HasForeignKey(t => t.TripId).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Ticket>().Property(tr => tr.Price);
         }
 
         public DbSet<User> Users { get; set; }
@@ -109,5 +111,6 @@ namespace backend.Infrastructure.Persistence
         public DbSet<Station> Stations { get; set; }
         public DbSet<Train> Trains { get; set; }
         public DbSet<Trip> Trips { get; set; }
+        public DbSet<Ticket> Tickets { get; set; }
     }
 }
