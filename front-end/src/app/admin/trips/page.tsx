@@ -70,7 +70,9 @@ export default function TripsPage() {
     arrivalStationId: "",
     trainId: "",
   });
-
+  const [isDelayDialogOpen, setIsDelayDialogOpen] = useState(false);
+  const [delayTripId, setDelayTripId] = useState<number | null>(null);
+  const [delayMinutes, setDelayMinutes] = useState<number>(0);
   useEffect(() => {
     fetchTrips();
     fetchStations();
@@ -325,6 +327,18 @@ export default function TripsPage() {
                         </Button>
                       </div>
                     </TableCell>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setDelayTripId(trip.code);
+                        setDelayMinutes(0);
+                        setIsDelayDialogOpen(true);
+                      }}
+                      className="text-yellow-600 hover:text-yellow-700"
+                    >
+                      Delay
+                    </Button>
                   </TableRow>
                 ))}
               </TableBody>
@@ -533,6 +547,66 @@ export default function TripsPage() {
                   {errorMessage}
                 </div>
               )}
+            </form>
+          </DialogContent>
+        </Dialog>
+        <Dialog open={isDelayDialogOpen} onOpenChange={setIsDelayDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Delay Trip #{delayTripId}</DialogTitle>
+            </DialogHeader>
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                if (!delayTripId) return;
+
+                try {
+                  const res = await fetch(
+                    `${process.env.NEXT_PUBLIC_API}/api/Trip/delay`,
+                    {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      credentials: "include",
+                      body: JSON.stringify({
+                        tripIds: [delayTripId],
+                        delayMinutes: delayMinutes,
+                      }),
+                    }
+                  );
+
+                  if (!res.ok) throw new Error("Failed to delay trip");
+                  setRefetch((prev) => prev + 1);
+                  setIsDelayDialogOpen(false);
+                } catch (err) {
+                  if (err instanceof Error) setErrorMessage(err.message);
+                }
+              }}
+              className="space-y-4"
+            >
+              <div>
+                <Label>Delay Minutes</Label>
+                <Input
+                  type="number"
+                  value={delayMinutes}
+                  onChange={(e) => setDelayMinutes(Number(e.target.value))}
+                  required
+                />
+              </div>
+              <div className="flex gap-2 pt-4">
+                <Button
+                  type="submit"
+                  className="bg-yellow-600 hover:bg-yellow-700"
+                >
+                  Apply Delay
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsDelayDialogOpen(false)}
+                >
+                  Cancel
+                </Button>
+              </div>
             </form>
           </DialogContent>
         </Dialog>
