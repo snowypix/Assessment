@@ -15,16 +15,15 @@ function normalizeClaims(decoded: any) {
 }
 export async function adminMiddleware(req: NextRequest) {
     const token = req.cookies.get("auth_token")?.value;
-    const isValid = await validateToken(token);
+    // const isValid = await validateToken(token);
     const { pathname, search } = req.nextUrl;
 
-    if (!isValid || !token) {
+    if (!token) {
 
         const loginUrl = new URL("/login", req.url);
         loginUrl.searchParams.set("redirect", pathname + search);
 
         const res = NextResponse.redirect(loginUrl);
-        res.cookies.set("auth_token", "", { maxAge: 0 });
         return res;
     }
 

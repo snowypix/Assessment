@@ -5,6 +5,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>back_end</RootNamespace>
+    <UserSecretsId>7a884c81-5c1c-4608-9bc2-d190f0ff257c</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
     <ItemGroup>
 	  <PackageReference Include="AutoMapper" Version="12.0.1" />

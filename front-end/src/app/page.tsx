@@ -37,6 +37,9 @@ interface User {
 }
 
 export default function HomePage() {
+  localStorage.removeItem("departure");
+  localStorage.removeItem("arrival");
+  localStorage.removeItem("selectedTrip");
   const router = useRouter();
   const [stations, setStations] = useState<Station[]>([]);
   const [schedules, setSchedules] = useState<Schedule[]>([]);

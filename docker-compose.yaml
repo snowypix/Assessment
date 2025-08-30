@@ -1,0 +1,59 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: raildb
+      MYSQL_USER: railuser
+      MYSQL_PASSWORD: railpassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - app-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: ./back-end/Dockerfile
+    container_name: rails-backend
+    restart: always
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: "Server=mysql;Database=raildb;User=railuser;Password=railpassword;"
+      Jwt__Key: "pixitowlapiwelihhhhhpixitowlapiwelihhhhhpixitowlapiwelihhhhh"
+      QrCrypto__Base64Key: "P8jEd5TjZC/ekq1kYOGwX8WknZcB9L7rT5/7kdq0G4M="
+    depends_on:
+      - mysql
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./front-end
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API: "http://localhost:8080"
+    container_name: rails-frontend
+    restart: always
+    environment:
+      NEXT_PUBLIC_API: "http://localhost:8080"
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000" # Next.js dev server
+    networks:
+      - app-network
+
+volumes:
+  mysql_data:
+
+
+networks:
+  app-network:
+    driver: bridge

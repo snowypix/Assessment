@@ -20,12 +20,11 @@ export async function clientMiddleware(req: NextRequest) {
     const { pathname, search } = req.nextUrl;
 
     // 1. No token or invalid → redirect to login
-    if (!token || !(await validateToken(token))) {
+    if (!token) {
         const loginUrl = new URL("/login", req.url);
         loginUrl.searchParams.set("redirect", pathname + search);
 
         const res = NextResponse.redirect(loginUrl);
-        res.cookies.set("auth_token", "", { maxAge: 0 });
         return res;
     }
 

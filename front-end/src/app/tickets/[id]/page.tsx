@@ -109,9 +109,6 @@ export default function BookTicketPage() {
       if (!res.ok) throw new Error("Failed to create booking");
       const ticket: Ticket = await res.json();
       setBookedTicket(ticket);
-      localStorage.removeItem("departure");
-      localStorage.removeItem("arrival");
-      localStorage.removeItem("selectedTrip");
     } catch (error) {
       console.error("Booking error:", error);
     } finally {
@@ -221,8 +218,17 @@ export default function BookTicketPage() {
             >
               Print Ticket
             </Button>
-            <Button asChild>
-              <Link href="/">Book Another Ticket</Link>
+            <Button
+              onClick={() => {
+                localStorage.removeItem("departure");
+                localStorage.removeItem("arrival");
+                localStorage.removeItem("selectedTrip");
+                router.push("/");
+              }}
+              variant="outline"
+              className="mr-4"
+            >
+              Book Another Ticket
             </Button>
           </div>
         </div>
@@ -379,7 +385,7 @@ export default function BookTicketPage() {
                 <span className="text-amber-600">
                   $
                   {trip.prices?.[selectedClass] ??
-                    (selectedClass === 1 ? trip.price : trip.price * 1.5)}
+                    (selectedClass === 2 ? trip.price : trip.price * 1.5)}
                 </span>
               </div>
 
