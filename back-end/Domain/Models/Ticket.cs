@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using AccountService.Exceptions;
+using Microsoft.VisualBasic;
 namespace backend.Domain.Models
 {
 
@@ -35,6 +36,10 @@ namespace backend.Domain.Models
 
             QrCode = encryptedQr;
         }
+        public void DelayBy(int delay)
+        {
+            Delay = Delay + delay;
+        }
         [Key]
         public int Code { get; set; }
         [Required]
@@ -48,5 +53,6 @@ namespace backend.Domain.Models
         public Trip Trip { get; set; }
         public int TripId { get; set; }
         public int Price { get; set; }
+        public DateInterval Delay { get; set; }
     }
 }

@@ -5,6 +5,8 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using AccountService.Exceptions;
+using backend.Domain.Events;
+using MediatR;
 using Microsoft.VisualBasic;
 namespace backend.Domain.Models
 {
@@ -42,6 +44,16 @@ namespace backend.Domain.Models
             ArrivalStationId = arrivalStationId;
             DepartureStationId = departureStationId;
         }
+        private readonly List<INotification> _domainEvents = new();
+        public IReadOnlyCollection<INotification> DomainEvents => _domainEvents.AsReadOnly();
+
+        public void DelayTrip(int minutes)
+        {
+            Delay = Delay + minutes;
+            Status = "Delayed";
+            _domainEvents.Add(new TripDelayedEvent(Code, minutes));
+        }
+        public void ClearDomainEvents() => _domainEvents.Clear();
         [Key]
         public int Code { get; set; }
         [Required]

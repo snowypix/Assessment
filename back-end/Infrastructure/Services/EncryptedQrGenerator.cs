@@ -1,4 +1,3 @@
-// backend.Infrastructure/Security/AesGcmEncryptedQrGenerator.cs
 using System;
 using System.Security.Cryptography;
 using System.Text;
@@ -27,7 +26,6 @@ namespace backend.Infrastructure.Security
 
         public string Generate(Ticket ticket)
         {
-            // Keep payload small & safe (no PII)
             var payload = new
             {
                 TicketCode = ticket.Code,
@@ -48,7 +46,6 @@ namespace backend.Infrastructure.Security
             using var aes = new AesGcm(_key);
             aes.Encrypt(nonce, plaintext, ciphertext, tag);
 
-            // Concatenate nonce + ciphertext + tag
             var combined = new byte[nonce.Length + ciphertext.Length + tag.Length];
             Buffer.BlockCopy(nonce, 0, combined, 0, nonce.Length);
             Buffer.BlockCopy(ciphertext, 0, combined, nonce.Length, ciphertext.Length);

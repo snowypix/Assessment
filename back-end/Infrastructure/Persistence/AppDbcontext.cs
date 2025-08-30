@@ -100,6 +100,7 @@ namespace backend.Infrastructure.Persistence
             modelBuilder.Entity<Ticket>().HasOne(t => t.Client).WithMany(u => u.Tickets).HasForeignKey(t => t.ClientId).OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<Ticket>().HasOne(t => t.Trip).WithMany(u => u.Tickets).HasForeignKey(t => t.TripId).OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<Ticket>().Property(tr => tr.Price);
+            modelBuilder.Entity<Ticket>().Property(tr => tr.Delay);
         }
 
         public DbSet<User> Users { get; set; }

@@ -63,6 +63,12 @@ namespace backend.Api.Controllers
 
             return Ok(trips);
         }
+        [HttpPost("delay")]
+        public async Task<IActionResult> DelayTrips([FromBody] DelayTripsCommand command)
+        {
+            await _mediator.Send(command);
+            return Ok(new { message = "Trips delayed successfully" });
+        }
 
     }
 }
