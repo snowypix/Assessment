@@ -236,11 +236,14 @@ export default function TripsPage() {
         setIsDialogOpen(false);
       }
     } catch (err) {
-      setErrorMessage(err.message || "Unexpected error");
+      if (err instanceof Error) {
+        setErrorMessage(err.message);
+      } else {
+        setErrorMessage("Unexpected error");
+      }
     }
   };
 
-  // ✅ Helpers to display names
   const getStationName = (id: number) =>
     stations.find((s) => s.code === id)?.name || `#${id}`;
   const getTrainName = (id: number) =>

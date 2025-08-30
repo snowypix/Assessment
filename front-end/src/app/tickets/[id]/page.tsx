@@ -14,8 +14,8 @@ import { Separator } from "@/components/ui/separator";
 import { MapPin, Train, CreditCard, QrCode, Clock } from "lucide-react";
 import Link from "next/link";
 import QRCode from "react-qr-code";
+import { useRouter } from "next/navigation";
 
-// ================== Types ==================
 interface Ticket {
   id: number;
   code: number;
@@ -51,15 +51,14 @@ interface User {
   email: string;
 }
 
-// ================== Component ==================
 export default function BookTicketPage() {
+  const router = useRouter();
   const [selectedClass, setSelectedClass] = useState<number>(1);
   const [isBooking, setIsBooking] = useState(false);
   const [bookedTicket, setBookedTicket] = useState<Ticket | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [trip, setTrip] = useState<Trip | null>(null);
 
-  // ====== Fetch logged-in user info ======
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -76,11 +75,12 @@ export default function BookTicketPage() {
     fetchUser();
   }, []);
 
-  // ====== Load trip from localStorage ======
   useEffect(() => {
     const stored = localStorage.getItem("selectedTrip");
     if (stored) {
       setTrip(JSON.parse(stored));
+    } else {
+      router.push("/");
     }
   }, []);
 
@@ -90,11 +90,12 @@ export default function BookTicketPage() {
       minute: "2-digit",
     });
 
-  // ====== Book ticket API ======
   const handleBookTicket = async () => {
     if (!trip) return;
     setIsBooking(true);
     try {
+      console.log(selectedClass);
+
       const res = await fetch(`${process.env.NEXT_PUBLIC_API}/api/ticket`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -108,6 +109,9 @@ export default function BookTicketPage() {
       if (!res.ok) throw new Error("Failed to create booking");
       const ticket: Ticket = await res.json();
       setBookedTicket(ticket);
+      localStorage.removeItem("departure");
+      localStorage.removeItem("arrival");
+      localStorage.removeItem("selectedTrip");
     } catch (error) {
       console.error("Booking error:", error);
     } finally {
@@ -115,7 +119,6 @@ export default function BookTicketPage() {
     }
   };
 
-  // ====== Ticket Confirmation View ======
   if (bookedTicket && trip) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4">
@@ -227,7 +230,6 @@ export default function BookTicketPage() {
     );
   }
 
-  // ====== Booking Form ======
   if (!trip) {
     return <p className="text-center mt-20">Loading trip details...</p>;
   }
@@ -325,7 +327,7 @@ export default function BookTicketPage() {
                       <div className="flex justify-between items-start">
                         <div>
                           <p className="font-medium">
-                            {classId === "1" ? "Second Class" : "First Class"}
+                            {classId === "2" ? "Second Class" : "First Class"}
                           </p>
                           <p className="text-sm text-slate-600">
                             {classId === "1"
@@ -337,8 +339,7 @@ export default function BookTicketPage() {
                       </div>
                     </div>
                   ))
-                : // fallback if no dynamic prices
-                  [1, 2].map((c) => (
+                : [1, 2].map((c) => (
                     <div
                       key={c}
                       className={`p-4 border rounded-lg cursor-pointer transition-colors ${
@@ -351,16 +352,16 @@ export default function BookTicketPage() {
                       <div className="flex justify-between items-start">
                         <div>
                           <p className="font-medium">
-                            {c === 1 ? "Second Class" : "First Class"}
+                            {c === 2 ? "Second Class" : "First Class"}
                           </p>
                           <p className="text-sm text-slate-600">
-                            {c === 1
+                            {c === 2
                               ? "Standard seating with basic amenities"
                               : "Luxury seating with full service"}
                           </p>
                         </div>
                         <p className="font-semibold text-lg">
-                          ${trip.price * (c === 1 ? 1 : 2)}
+                          ${trip.price * (c === 2 ? 1 : 1.5)}
                         </p>
                       </div>
                     </div>
@@ -378,7 +379,7 @@ export default function BookTicketPage() {
                 <span className="text-amber-600">
                   $
                   {trip.prices?.[selectedClass] ??
-                    (selectedClass === 1 ? trip.price : trip.price * 2)}
+                    (selectedClass === 1 ? trip.price : trip.price * 1.5)}
                 </span>
               </div>
 

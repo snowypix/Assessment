@@ -47,7 +47,6 @@ export default function TrainsPage() {
     status: "",
   });
 
-  // ✅ Fetch trains on mount
   useEffect(() => {
     fetchTrains();
   }, []);
@@ -109,7 +108,6 @@ export default function TrainsPage() {
 
     try {
       if (editingTrain) {
-        // ✅ Update train
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_API}/api/Train/${editingTrain.code}`,
           {
@@ -125,7 +123,6 @@ export default function TrainsPage() {
           prev.map((t) => (t.code === editingTrain.code ? newTrain : t))
         );
       } else {
-        // ✅ Create train
         const res = await fetch(`${process.env.NEXT_PUBLIC_API}/api/Train`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },

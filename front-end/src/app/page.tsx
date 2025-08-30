@@ -14,7 +14,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 type Schedule = {
   id: number;
-  departureDate: string; // ISO string
+  departureDate: string;
   departureStationId: number;
   arrivalStationId: number;
   trainType: string;
@@ -41,7 +41,6 @@ export default function HomePage() {
   const [stations, setStations] = useState<Station[]>([]);
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [loading, setLoading] = useState(false);
-  // instead of names, track station IDs
   const [departureId, setDepartureId] = useState<number | "">("");
   const [arrivalId, setArrivalId] = useState<number | "">("");
   const [user, setUser] = useState<User | null>(null);
