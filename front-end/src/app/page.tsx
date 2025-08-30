@@ -20,6 +20,8 @@ type Schedule = {
   trainType: string;
   price: string;
   duration: Date;
+  delay: number;
+  status: string;
 };
 
 type Station = {
@@ -208,18 +210,10 @@ export default function HomePage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {schedules.map((trip) => {
-                const departureTime = new Date(trip.departureDate);
-                const formattedTime = departureTime.toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                });
-
-                const formattedDate = departureTime.toLocaleDateString([], {
-                  weekday: "short",
-                  month: "short",
-                  day: "numeric",
-                });
-
+                const originalDeparture = new Date(trip.departureDate);
+                const newDeparture = new Date(
+                  originalDeparture.getTime() + trip.delay * 60000
+                );
                 return (
                   <Card
                     key={trip.id}
@@ -233,8 +227,38 @@ export default function HomePage() {
                         <Badge variant="default">{trip.trainType}</Badge>
                       </div>
                       <CardDescription className="text-xl font-bold text-primary">
-                        {formattedTime}{" "}
-                        <span className="text-sm">({formattedDate})</span>
+                        {trip.status === "Delayed" && trip.delay ? (
+                          <>
+                            <span className="line-through text-muted-foreground">
+                              {originalDeparture.toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}{" "}
+                              <span className="text-sm">
+                                {originalDeparture.toLocaleDateString()}
+                              </span>
+                            </span>{" "}
+                            <span className="text-red-600 font-bold">
+                              {newDeparture.toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}{" "}
+                              <span className="text-sm">
+                                {newDeparture.toLocaleDateString()}
+                              </span>
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            {originalDeparture.toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}{" "}
+                            <span className="text-sm">
+                              {originalDeparture.toLocaleDateString()}
+                            </span>
+                          </>
+                        )}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>

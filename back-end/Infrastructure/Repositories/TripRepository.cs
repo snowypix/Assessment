@@ -51,7 +51,8 @@ namespace backend.Infrastructure.Repositories
                     t.Train.Type,
                     t.Price,
                     t.Duration,
-                    t.Delay
+                    t.Delay,
+                    t.Status
                 ))
                 .ToListAsync(ct);
         }

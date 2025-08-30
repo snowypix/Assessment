@@ -10,7 +10,8 @@ namespace back_end.Application.DTOs
     string TrainType,
     int Price,
     DateInterval Duration,
-    DateInterval Delay
+    DateInterval Delay,
+    string Status
     );
 
 }
