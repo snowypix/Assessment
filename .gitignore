@@ -1,6 +1,9 @@
 back-end/bin
 back-end/obj
 back-end/.vs
+back-end.tests/.vs
+back-end.tests/obj
+back-end.tests/bin
 .vs
 front-end/node_modules
 front-end/.next
