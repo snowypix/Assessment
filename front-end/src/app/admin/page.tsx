@@ -13,64 +13,6 @@ export default function AdminDashboard() {
           <p className="text-slate-600 mt-2">Manage your railway system</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <Train className="h-8 w-8 text-amber-600" />
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-slate-600">
-                    Total Trains
-                  </p>
-                  <p className="text-2xl font-bold text-slate-900">24</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <MapPin className="h-8 w-8 text-cyan-600" />
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-slate-600">
-                    Total Stations
-                  </p>
-                  <p className="text-2xl font-bold text-slate-900">12</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <Users className="h-8 w-8 text-green-600" />
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-slate-600">
-                    Active Users
-                  </p>
-                  <p className="text-2xl font-bold text-slate-900">1,234</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <Calendar className="h-8 w-8 text-purple-600" />
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-slate-600">
-                    Today&apos;s Routes
-                  </p>
-                  <p className="text-2xl font-bold text-slate-900">48</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Link href="/admin/trains">
             <Card className="hover:shadow-lg transition-shadow cursor-pointer">

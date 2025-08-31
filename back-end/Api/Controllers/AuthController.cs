@@ -1,6 +1,7 @@
 using backend.Application.Auth.Commands;
 using backend.Application.Auth.Handlers;
 using backend.Application.DTOs;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -13,11 +14,12 @@ public class AuthController : ControllerBase
 {
     private readonly LoginHandler _loginHandler;
     private readonly RegisterHandler _registerHandler;
-
-    public AuthController(LoginHandler loginHandler, RegisterHandler registerHandler)
+    private readonly IMediator _mediator;
+    public AuthController(LoginHandler loginHandler, RegisterHandler registerHandler, IMediator mediator)
     {
         _loginHandler = loginHandler;
         _registerHandler = registerHandler;
+        _mediator = mediator;
     }
 
     [HttpGet("{id}")]
@@ -70,19 +72,12 @@ public class AuthController : ControllerBase
 
     [HttpGet("me")]
     [Authorize(AuthenticationSchemes = "Bearer")]
-    public IActionResult Me()
+    public async Task<IActionResult> Me([FromServices] IMediator mediator)
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        var username = User.Identity?.Name;
-        var permissions = User.Claims.Where(c => c.Type == "permission").Select(c => c.Value).ToList();
-        var roles = User.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value).ToList();
 
-        return Ok(new
-        {
-            UserId = userId,
-            Username = username,
-            Roles = roles,
-            Permissions = permissions
-        });
+        var result = await mediator.Send(new MyInformationsQuery(userId!));
+
+        return Ok(result);
     }
 }

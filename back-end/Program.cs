@@ -19,6 +19,7 @@ using backend.Application.Stations.Handlers;
 using back_end.Application.DTOs;
 using backend.Application.Abstractions;
 using backend.Infrastructure.Security;
+using back_end.Application.interfaces;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
 {
@@ -100,6 +101,7 @@ builder.Services.AddAuthorization(options =>
 });
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+builder.Services.AddScoped<IUserContext, UserContext>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<LoginHandler>();
 builder.Services.AddScoped<RegisterHandler>();
