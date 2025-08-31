@@ -90,10 +90,18 @@ export default function TrainsPage() {
           credentials: "include",
         }
       );
-      if (!res.ok) throw new Error("Failed to delete train");
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to delete station");
+      }
       setTrains(trains.filter((t) => t.code !== code));
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      if (err instanceof Error) {
+        setErrorMessage(err.message);
+        setIsWarningDialogOpen(true);
+      } else {
+        console.error("Unknown error", err);
+      }
     }
   };
 

@@ -1,7 +1,9 @@
+using AccountService.Exceptions;
 using backend.Application.Interfaces;
 using backend.Domain.Models;
 using backend.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using MySqlConnector;
 
 namespace backend.Infrastructure.Repositories
 {
@@ -36,6 +38,24 @@ namespace backend.Infrastructure.Repositories
         }
 
         public async Task SaveChangesAsync()
-            => await _db.SaveChangesAsync();
+        {
+            try
+            {
+                await _db.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex) when (IsForeignKeyViolation(ex))
+            {
+                throw new BusinessRuleException("Station cannot be deleted because it is referenced.");
+            }
+        }
+        private bool IsForeignKeyViolation(DbUpdateException ex)
+        {
+            if (ex.InnerException is MySqlException sqlEx)
+            {
+                // MySQL FK constraint fails
+                return sqlEx.Number == 1451;
+            }
+            return false;
+        }
     }
 }

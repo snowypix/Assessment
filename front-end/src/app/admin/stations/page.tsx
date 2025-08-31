@@ -28,6 +28,8 @@ interface Station {
 }
 
 export default function StationsPage() {
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isWarningDialogOpen, setIsWarningDialogOpen] = useState(false);
   const [stations, setStations] = useState<Station[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingStation, setEditingStation] = useState<Station | null>(null);
@@ -73,10 +75,18 @@ export default function StationsPage() {
           credentials: "include",
         }
       );
-      if (!res.ok) throw new Error("Failed to delete station");
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to delete station");
+      }
       setStations(stations.filter((s) => s.code !== code));
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      if (err instanceof Error) {
+        setErrorMessage(err.message);
+        setIsWarningDialogOpen(true);
+      } else {
+        console.error("Unknown error", err);
+      }
     }
   };
 
@@ -141,7 +151,32 @@ export default function StationsPage() {
             Add Station
           </Button>
         </div>
-
+        <Dialog
+          open={isWarningDialogOpen}
+          onOpenChange={(open) => {
+            if (!open) {
+              setIsWarningDialogOpen(false);
+            }
+            setIsWarningDialogOpen(open);
+          }}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Missing Data</DialogTitle>
+            </DialogHeader>
+            <p className="text-slate-700">{errorMessage}</p>
+            <div className="flex justify-end pt-4">
+              <Button
+                onClick={() => {
+                  setIsWarningDialogOpen(false);
+                }}
+                className="bg-amber-600 hover:bg-amber-700"
+              >
+                OK
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
         <Card>
           <CardHeader>
             <CardTitle>All Stations</CardTitle>
