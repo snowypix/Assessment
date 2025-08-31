@@ -8,10 +8,10 @@ namespace back_end.Application.DTOs
         public DateTime DepartureDate { get; set; }
         [Required]
 
-        public DateInterval Duration { get; set; }
+        public int Duration { get; set; }
         [Required]
 
-        public DateInterval Delay { get; set; }
+        public int Delay { get; set; }
         [Required]
         public int Price { get; set; }
         public string Status { get; set; }

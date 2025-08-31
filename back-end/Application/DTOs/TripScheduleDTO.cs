@@ -9,8 +9,8 @@ namespace back_end.Application.DTOs
     int ArrivalStationId,
     string TrainType,
     int Price,
-    DateInterval Duration,
-    DateInterval Delay,
+    int Duration,
+    int Delay,
     string Status
     );
 

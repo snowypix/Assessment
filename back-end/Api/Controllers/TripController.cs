@@ -16,7 +16,7 @@ namespace backend.Api.Controllers
         private readonly IMediator _mediator;
 
         public TripController(IMediator mediator) => _mediator = mediator;
-
+        [Authorize(Policy = "ManageTrips")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Trip>>> GetAll()
             => Ok(await _mediator.Send(new GetAllTripsQuery()));

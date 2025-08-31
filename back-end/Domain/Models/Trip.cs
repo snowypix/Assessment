@@ -16,7 +16,7 @@ namespace backend.Domain.Models
         public Trip()
         {
         }
-        public Trip(DateTime departureDate, DateInterval duration, DateInterval delay, string status, int price, int departureStationId, int arrivalStationId, int trainId)
+        public Trip(DateTime departureDate, int duration, int delay, string status, int price, int departureStationId, int arrivalStationId, int trainId)
         {
             if (DepartureStationId == arrivalStationId)
                 throw new BusinessRuleException("Source and destination stations cannot be the same.");
@@ -33,7 +33,7 @@ namespace backend.Domain.Models
             ArrivalStationId = arrivalStationId;
             TrainId = trainId;
         }
-        public void Update(DateTime departureDate, DateInterval duration, DateInterval delay, string status, int price, int trainId, int departureStationId, int arrivalStationId)
+        public void Update(DateTime departureDate, int duration, int delay, string status, int price, int trainId, int departureStationId, int arrivalStationId)
         {
             if (DepartureStationId == arrivalStationId)
                 throw new BusinessRuleException("Source and destination stations cannot be the same.");
@@ -63,10 +63,10 @@ namespace backend.Domain.Models
         public DateTime DepartureDate { get; set; }
         [Required]
 
-        public DateInterval Duration { get; set; }
+        public int Duration { get; set; }
         [Required]
 
-        public DateInterval Delay { get; set; }
+        public int Delay { get; set; }
         [Required]
 
         public string Status { get; set; }

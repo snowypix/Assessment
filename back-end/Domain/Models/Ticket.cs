@@ -53,6 +53,6 @@ namespace backend.Domain.Models
         public Trip Trip { get; set; }
         public int TripId { get; set; }
         public int Price { get; set; }
-        public DateInterval Delay { get; set; }
+        public int Delay { get; set; }
     }
 }

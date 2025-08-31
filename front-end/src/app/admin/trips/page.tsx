@@ -107,7 +107,6 @@ export default function TripsPage() {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API}/api/Station`, {
         credentials: "include",
       });
-      if (!res.ok) throw new Error("Failed to fetch stations");
       const data = await res.json();
       if (isEmpty(data)) {
         setMessage("You need to create stations first");
@@ -116,6 +115,8 @@ export default function TripsPage() {
         setStations(data);
       }
     } catch (err) {
+      setMessage("Please login again");
+      setIsWarningDialogOpen(true);
       console.error(err);
     }
   };
@@ -125,7 +126,6 @@ export default function TripsPage() {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API}/api/Train`, {
         credentials: "include",
       });
-      if (!res.ok) throw new Error("Failed to fetch trains");
       const data = await res.json();
       if (isEmpty(data)) {
         setMessage("You need to create stations first");
@@ -134,6 +134,8 @@ export default function TripsPage() {
         setTrains(data);
       }
     } catch (err) {
+      setMessage("Please login again");
+      setIsWarningDialogOpen(true);
       console.error(err);
     }
   };
@@ -386,7 +388,11 @@ export default function TripsPage() {
               <Button
                 onClick={() => {
                   setIsWarningDialogOpen(false);
-                  router.push("/admin");
+                  if (message == "Please login again") {
+                    router.push("/login");
+                  } else {
+                    router.push("/admin");
+                  }
                 }}
                 className="bg-amber-600 hover:bg-amber-700"
               >
