@@ -17,6 +17,15 @@ namespace backend.Application.Trips.Validators
             RuleFor(x => x.departureDate)
 .GreaterThan(_ => DateTime.UtcNow)
 .WithMessage("Choose a newer date.");
+            RuleFor(x => x.price)
+              .GreaterThan(0)
+              .WithMessage("Price should be positive.");
+            RuleFor(x => x.delay)
+              .GreaterThan(0)
+              .WithMessage("Delay should be positive.");
+            RuleFor(x => x.duration)
+              .GreaterThan(0)
+              .WithMessage("Duration should be positive.");
         }
     }
 }

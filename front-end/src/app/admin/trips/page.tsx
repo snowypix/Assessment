@@ -213,17 +213,13 @@ export default function TripsPage() {
             credentials: "include",
           }
         );
+
         const data = await res.json();
-        if (res.status == 400) {
-          const data: any = await res.json();
-          setErrorMessage(data.error);
-          setIsWarningDialogOpen(true);
-        } else {
-          setTrips(trips.filter((t) => t.code !== code));
-        }
+
         if (!res.ok) {
-          if (data?.error) {
-            setErrorMessage(data?.error);
+          if (data?.Errors) {
+            const messages = Object.values(data.Errors).flat().join("\n");
+            setErrorMessage(messages);
           } else if (data?.message) {
             setErrorMessage(data.message);
           } else {
@@ -231,10 +227,11 @@ export default function TripsPage() {
           }
           return;
         }
+
         setTrips((prev) =>
-          prev.map((t) => (t.code === editingTrip.code ? newTrip : t))
+          prev.map((t) => (t.code === editingTrip.code ? data : t))
         );
-        setRefetch((prev) => prev + 1);
+
         setErrorMessage(null);
         setIsDialogOpen(false);
       } else {

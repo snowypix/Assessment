@@ -100,7 +100,7 @@ export default function TrainsPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newTrain: Train = {
-      code: editingTrain?.code ?? 0, // temporary 0 for new train
+      code: editingTrain?.code ?? 0,
       capacity: Number(formData.capacity),
       type: formData.type,
       status: formData.status,
