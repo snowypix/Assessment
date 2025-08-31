@@ -178,6 +178,7 @@ using (var scope = app.Services.CreateScope())
             new RolePermission { RoleId = 1, PermissionId = 5 },
             new RolePermission { RoleId = 1, PermissionId = 6 },
             new RolePermission { RoleId = 1, PermissionId = 7 },
+            new RolePermission { RoleId = 1, PermissionId = 8 },
 
             new RolePermission { RoleId = 2, PermissionId = 1 },
             new RolePermission { RoleId = 2, PermissionId = 2 },

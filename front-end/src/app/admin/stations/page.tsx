@@ -31,7 +31,7 @@ export default function StationsPage() {
   const [stations, setStations] = useState<Station[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingStation, setEditingStation] = useState<Station | null>(null);
-  const [formData, setFormData] = useState({ code: "", name: "" });
+  const [formData, setFormData] = useState({ name: "" });
 
   useEffect(() => {
     fetchStations();
@@ -52,14 +52,13 @@ export default function StationsPage() {
 
   const handleAdd = () => {
     setEditingStation(null);
-    setFormData({ code: "", name: "" });
+    setFormData({ name: "" });
     setIsDialogOpen(true);
   };
 
   const handleEdit = (station: Station) => {
     setEditingStation(station);
     setFormData({
-      code: station.code.toString(),
       name: station.name,
     });
     setIsDialogOpen(true);
@@ -84,7 +83,7 @@ export default function StationsPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newStation: Station = {
-      code: Number(formData.code),
+      code: editingStation?.code ?? 0,
       name: formData.name,
     };
 
@@ -121,7 +120,7 @@ export default function StationsPage() {
     }
 
     setIsDialogOpen(false);
-    setFormData({ code: "", name: "" });
+    setFormData({ name: "" });
   };
 
   return (
@@ -198,18 +197,7 @@ export default function StationsPage() {
               </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <Label htmlFor="code">Station Code</Label>
-                <Input
-                  id="code"
-                  type="number"
-                  value={formData.code}
-                  onChange={(e) =>
-                    setFormData({ ...formData, code: e.target.value })
-                  }
-                  required
-                />
-              </div>
+              <div></div>
               <div>
                 <Label htmlFor="name">Station Name</Label>
                 <Input

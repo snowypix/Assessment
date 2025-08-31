@@ -38,10 +38,11 @@ interface Train {
 
 export default function TrainsPage() {
   const [trains, setTrains] = useState<Train[]>([]);
+  const [isWarningDialogOpen, setIsWarningDialogOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTrain, setEditingTrain] = useState<Train | null>(null);
   const [formData, setFormData] = useState({
-    code: "",
     capacity: "",
     type: "",
     status: "",
@@ -57,7 +58,7 @@ export default function TrainsPage() {
         credentials: "include",
       });
       if (!res.ok) throw new Error("Failed to fetch trains");
-      const data = await res.json();
+      const data: Train[] = await res.json();
       setTrains(data);
     } catch (err) {
       console.error(err);
@@ -66,14 +67,13 @@ export default function TrainsPage() {
 
   const handleAdd = () => {
     setEditingTrain(null);
-    setFormData({ code: "", capacity: "", type: "", status: "" });
+    setFormData({ capacity: "", type: "", status: "" });
     setIsDialogOpen(true);
   };
 
   const handleEdit = (train: Train) => {
     setEditingTrain(train);
     setFormData({
-      code: train.code.toString(),
       capacity: train.capacity.toString(),
       type: train.type,
       status: train.status,
@@ -100,7 +100,7 @@ export default function TrainsPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newTrain: Train = {
-      code: Number(formData.code),
+      code: editingTrain?.code ?? 0, // temporary 0 for new train
       capacity: Number(formData.capacity),
       type: formData.type,
       status: formData.status,
@@ -117,11 +117,16 @@ export default function TrainsPage() {
             credentials: "include",
           }
         );
-        if (!res.ok) throw new Error("Failed to update train");
-
-        setTrains((prev) =>
-          prev.map((t) => (t.code === editingTrain.code ? newTrain : t))
-        );
+        // if (!res.ok) throw new Error("Failed to update train");
+        if (res.status == 400) {
+          const data: any = await res.json();
+          setErrorMessage(data.error);
+          setIsWarningDialogOpen(true);
+        } else {
+          setTrains((prev) =>
+            prev.map((t) => (t.code === editingTrain.code ? newTrain : t))
+          );
+        }
       } else {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API}/api/Train`, {
           method: "POST",
@@ -129,19 +134,24 @@ export default function TrainsPage() {
           body: JSON.stringify(newTrain),
           credentials: "include",
         });
-        if (!res.ok) throw new Error("Failed to create train");
-        const created = await res.json();
+        // if (!res.ok) throw new Error("Failed to create train");
+        if (res.status == 400) {
+          const data: any = await res.json();
+          setErrorMessage(data.error);
+          setIsWarningDialogOpen(true);
+        } else {
+          const created: Train = await res.json();
 
-        setTrains((prev) => [...prev, created]);
+          setTrains((prev) => [...prev, created]);
+        }
       }
     } catch (err) {
       console.error(err);
     }
 
     setIsDialogOpen(false);
-    setFormData({ code: "", capacity: "", type: "", status: "" });
+    setFormData({ capacity: "", type: "", status: "" });
   };
-
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="container mx-auto px-4 py-8">
@@ -160,7 +170,32 @@ export default function TrainsPage() {
             Add Train
           </Button>
         </div>
-
+        <Dialog
+          open={isWarningDialogOpen}
+          onOpenChange={(open) => {
+            if (!open) {
+              setIsWarningDialogOpen(false);
+            }
+            setIsWarningDialogOpen(open);
+          }}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Missing Data</DialogTitle>
+            </DialogHeader>
+            <p className="text-slate-700">{errorMessage}</p>
+            <div className="flex justify-end pt-4">
+              <Button
+                onClick={() => {
+                  setIsWarningDialogOpen(false);
+                }}
+                className="bg-amber-600 hover:bg-amber-700"
+              >
+                OK
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
         <Card>
           <CardHeader>
             <CardTitle>All Trains</CardTitle>
@@ -230,18 +265,6 @@ export default function TrainsPage() {
               </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <Label htmlFor="code">Train Code</Label>
-                <Input
-                  id="code"
-                  type="number"
-                  value={formData.code}
-                  onChange={(e) =>
-                    setFormData({ ...formData, code: e.target.value })
-                  }
-                  required
-                />
-              </div>
               <div>
                 <Label htmlFor="capacity">Capacity</Label>
                 <Input

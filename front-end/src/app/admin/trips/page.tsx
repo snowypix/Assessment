@@ -28,6 +28,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Pencil, Trash2, Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface Trip {
   code: number;
@@ -52,12 +53,15 @@ interface Train {
 }
 
 export default function TripsPage() {
+  const router = useRouter();
+  const [isWarningDialogOpen, setIsWarningDialogOpen] = useState(false);
   const [trips, setTrips] = useState<Trip[]>([]);
   const [stations, setStations] = useState<Station[]>([]);
   const [trains, setTrains] = useState<Train[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTrip, setEditingTrip] = useState<Trip | null>(null);
   const [refetch, setRefetch] = useState(0);
+  const [message, setMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     code: "",
@@ -91,7 +95,13 @@ export default function TripsPage() {
       console.error(err);
     }
   };
-
+  function isEmpty(data: any) {
+    if (data === null || data === undefined) return true;
+    if (Array.isArray(data) && data.length === 0) return true;
+    if (typeof data === "object" && Object.keys(data).length === 0) return true;
+    if (typeof data === "string" && data.trim() === "") return true;
+    return false;
+  }
   const fetchStations = async () => {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API}/api/Station`, {
@@ -99,8 +109,12 @@ export default function TripsPage() {
       });
       if (!res.ok) throw new Error("Failed to fetch stations");
       const data = await res.json();
-      console.log(data);
-      setStations(data);
+      if (isEmpty(data)) {
+        setMessage("You need to create stations first");
+        setIsWarningDialogOpen(true);
+      } else {
+        setStations(data);
+      }
     } catch (err) {
       console.error(err);
     }
@@ -113,7 +127,12 @@ export default function TripsPage() {
       });
       if (!res.ok) throw new Error("Failed to fetch trains");
       const data = await res.json();
-      setTrains(data);
+      if (isEmpty(data)) {
+        setMessage("You need to create stations first");
+        setIsWarningDialogOpen(true);
+      } else {
+        setTrains(data);
+      }
     } catch (err) {
       console.error(err);
     }
@@ -193,11 +212,16 @@ export default function TripsPage() {
           }
         );
         const data = await res.json();
-
+        if (res.status == 400) {
+          const data: any = await res.json();
+          setErrorMessage(data.error);
+          setIsWarningDialogOpen(true);
+        } else {
+          setTrips(trips.filter((t) => t.code !== code));
+        }
         if (!res.ok) {
-          if (data?.Errors) {
-            const messages = Object.values(data.Errors).flat().join("\n");
-            setErrorMessage(messages);
+          if (data?.error) {
+            setErrorMessage(data?.error);
           } else if (data?.message) {
             setErrorMessage(data.message);
           } else {
@@ -231,8 +255,7 @@ export default function TripsPage() {
           }
           return;
         }
-        const created = await res.json();
-        setTrips((prev) => [...prev, created]);
+        setTrips((prev) => [...prev, data]);
         setRefetch((prev) => prev + 1);
         setErrorMessage(null);
         setIsDialogOpen(false);
@@ -325,27 +348,53 @@ export default function TripsPage() {
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setDelayTripId(trip.code);
+                            setDelayMinutes(0);
+                            setIsDelayDialogOpen(true);
+                          }}
+                          className="text-yellow-600 hover:text-yellow-700"
+                        >
+                          Delay
+                        </Button>
                       </div>
                     </TableCell>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setDelayTripId(trip.code);
-                        setDelayMinutes(0);
-                        setIsDelayDialogOpen(true);
-                      }}
-                      className="text-yellow-600 hover:text-yellow-700"
-                    >
-                      Delay
-                    </Button>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           </CardContent>
         </Card>
-
+        <Dialog
+          open={isWarningDialogOpen}
+          onOpenChange={(open) => {
+            if (!open) {
+              setIsWarningDialogOpen(false);
+            }
+            setIsWarningDialogOpen(open);
+          }}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Missing Data</DialogTitle>
+            </DialogHeader>
+            <p className="text-slate-700">{message}</p>
+            <div className="flex justify-end pt-4">
+              <Button
+                onClick={() => {
+                  setIsWarningDialogOpen(false);
+                  router.push("/admin");
+                }}
+                className="bg-amber-600 hover:bg-amber-700"
+              >
+                OK
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
         {/* Dialog */}
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent>

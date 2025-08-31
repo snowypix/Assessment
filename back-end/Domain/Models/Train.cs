@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
+using AccountService.Exceptions;
 namespace backend.Domain.Models
 {
 
@@ -15,12 +16,20 @@ namespace backend.Domain.Models
         }
         public Train(int capacite, string type, string status)
         {
+            if (capacite < 0)
+            {
+                throw new BusinessRuleException("Capacity can't be negative.");
+            }
             Capacity = capacite;
             Type = type;
             Status = status;
         }
         public void Update(string type, int capacite, string status)
         {
+            if (capacite < 0)
+            {
+                throw new BusinessRuleException("Capacity can't be negative.");
+            }
             Capacity = capacite;
             Type = type;
             Status = status;

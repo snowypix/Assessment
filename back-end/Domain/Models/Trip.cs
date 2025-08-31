@@ -20,7 +20,10 @@ namespace backend.Domain.Models
         {
             if (DepartureStationId == arrivalStationId)
                 throw new BusinessRuleException("Source and destination stations cannot be the same.");
-
+            if (price < 0)
+            {
+                throw new BusinessRuleException("Price can't be negative.");
+            }
             DepartureDate = departureDate;
             Duration = duration;
             Delay = delay;
