@@ -1,7 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateToken } from "../lib/auth/validateToken";
 import jwt from "jsonwebtoken";
-function normalizeClaims(decoded: any) {
+interface JwtClaims {
+    sub?: string;
+    name?: string;
+    role?: string;
+    permission?: string[];
+    "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"?: string;
+    "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"?: string;
+}
+
+function normalizeClaims(decoded: JwtClaims) {
     return {
         sub: decoded.sub,
         name:
@@ -15,7 +24,6 @@ function normalizeClaims(decoded: any) {
 }
 export async function adminMiddleware(req: NextRequest) {
     const token = req.cookies.get("auth_token")?.value;
-    // const isValid = await validateToken(token);
     const { pathname, search } = req.nextUrl;
 
     if (!token) {
@@ -29,8 +37,8 @@ export async function adminMiddleware(req: NextRequest) {
 
     try {
         const decoded = jwt.decode(token) as { role?: string };
-
-        const claims = normalizeClaims(decoded);
+        console.log(decoded);
+        const claims = normalizeClaims(decoded as JwtClaims);
 
         if (claims.role !== "Planner") {
             return NextResponse.redirect(new URL("/unauthorized", req.url));
