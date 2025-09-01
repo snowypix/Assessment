@@ -1,6 +1,7 @@
 back-end/bin
 back-end/obj
 back-end/.vs
+back-end/appsettings.Development.json
 back-end.tests/.vs
 back-end.tests/obj
 back-end.tests/bin
