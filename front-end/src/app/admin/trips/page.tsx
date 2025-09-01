@@ -378,7 +378,7 @@ export default function TripsPage() {
         >
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Missing Data</DialogTitle>
+              <DialogTitle>Error</DialogTitle>
             </DialogHeader>
             <p className="text-slate-700">{message}</p>
             <div className="flex justify-end pt-4">

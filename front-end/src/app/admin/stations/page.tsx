@@ -163,7 +163,7 @@ export default function StationsPage() {
         >
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Missing Data</DialogTitle>
+              <DialogTitle>Error</DialogTitle>
             </DialogHeader>
             <p className="text-slate-700">{errorMessage}</p>
             <div className="flex justify-end pt-4">
