@@ -23,8 +23,6 @@ The solution follows a **Clean Architecture + CQRS** approach:
 
 # Project Structure
 
-# Project Structure
-
 ## 📦 Back-end
 
 - **Application** → Commands, Queries, Validators, Handlers
@@ -39,7 +37,7 @@ The solution follows a **Clean Architecture + CQRS** approach:
 
 ## 📦 Front-end (Next.js 15)
 
-- Folder structure to be added here
+## 📦 Back-end unit tests (XUnit/FluentAssertions and Moq)
 
 ---
 
@@ -68,7 +66,7 @@ The solution follows a **Clean Architecture + CQRS** approach:
 ---
 
 ➡️ Run the project:
-`docker-compose up --build`
+`docker-compose up`
 
 # Notes
 
@@ -77,3 +75,4 @@ Some technical requirements were simplified for the sake of the assessment, for 
 - The primary key of most tables is used alone, the common practice is to generate UUID that are hard to guess in order to hide sensitive data.
 - Trips only consist of 2 stations : the departure and the arrival.
 - Not all attributes influence the business logic, for ex the train capacity does not enforce a limit on tickets.
+- Unit tests were divided by layers, and for instance aim to test Trips business logic.
