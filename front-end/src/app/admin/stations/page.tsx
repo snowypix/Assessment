@@ -47,8 +47,9 @@ export default function StationsPage() {
       if (!res.ok) throw new Error("Failed to fetch stations");
       const data = await res.json();
       setStations(data);
-    } catch (err) {
-      console.error(err);
+    } catch {
+      setErrorMessage("An error has occured pleaser reload the page.");
+      setIsWarningDialogOpen(true);
     }
   };
 

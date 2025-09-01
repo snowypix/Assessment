@@ -12,6 +12,12 @@ import { Badge } from "@/components/ui/badge";
 import { Clock, MapPin, Train, Users, Shield, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 type Schedule = {
   id: number;
   departureDate: string;
@@ -38,6 +44,8 @@ interface User {
 
 export default function HomePage() {
   const router = useRouter();
+  const [isWarningDialogOpen, setIsWarningDialogOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [stations, setStations] = useState<Station[]>([]);
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [loading, setLoading] = useState(false);
@@ -63,8 +71,9 @@ export default function HomePage() {
         if (!res.ok) throw new Error("Failed to fetch stations");
         const data = await res.json();
         setStations(data);
-      } catch (error) {
-        console.error("Error fetching stations:", error);
+      } catch {
+        setErrorMessage("An error has occured pleaser reload the page.");
+        setIsWarningDialogOpen(true);
       }
     }
     fetchStations();
@@ -219,7 +228,37 @@ export default function HomePage() {
           </Card>
         </div>
       </section>
-
+      <Dialog
+        open={isWarningDialogOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            setIsWarningDialogOpen(false);
+          }
+          setIsWarningDialogOpen(open);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Error</DialogTitle>
+          </DialogHeader>
+          <p className="text-slate-700">{errorMessage}</p>
+          <div className="flex justify-end pt-4">
+            <Button
+              onClick={() => {
+                setIsWarningDialogOpen(false);
+                if (errorMessage == "Please login again") {
+                  router.push("/login");
+                } else {
+                  router.push("/");
+                }
+              }}
+              className="bg-amber-600 hover:bg-amber-700"
+            >
+              OK
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
       {/* Upcoming Departures */}
       <section className="py-12 px-4 bg-muted/30" id="schedules">
         <div className="container mx-auto max-w-6xl">
