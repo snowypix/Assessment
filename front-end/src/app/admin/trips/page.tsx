@@ -484,9 +484,7 @@ export default function TripsPage() {
                         <SelectItem
                           key={s.code}
                           value={s.code.toString()}
-                          disabled={
-                            s.code === Number(formData.arrivalStationId)
-                          }
+                          disabled={s.code == Number(formData.arrivalStationId)}
                         >
                           {s.name}
                         </SelectItem>
@@ -522,7 +520,7 @@ export default function TripsPage() {
                           key={s.code}
                           value={s.code.toString()}
                           disabled={
-                            s.code === Number(formData.arrivalStationId)
+                            s.code === Number(formData.departureStationId)
                           }
                         >
                           {s.name}
