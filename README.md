@@ -12,7 +12,7 @@
 - ✅ **Validation rules** (e.g., departure before arrival, trips not in the past).
 - ✅ **CQRS pattern** with MediatR for request/response separation.
 - ✅ **FluentValidation** for robust input validation.
-- ✅ **JWT Authentication** with expiration validation.
+- ✅ **JWT Authentication** with expiration validation, and injection in cookies.
 - ✅ **Dockerized deployment** for MySQL, .NET backend, and Next.js frontend.
 
 ---
@@ -53,7 +53,7 @@ The solution follows a **Clean Architecture + CQRS** approach:
    - When a trip is delayed, a **`TripDelayedEvent`** is raised.
    - All related tickets are updated with the new departure time.
 
-3. **Validation**
+3. **Validation Examples**
 
    - Same station for departure & arrival ➝ ❌ Invalid
    - Past departure date ➝ ❌ Invalid
@@ -70,7 +70,8 @@ The solution follows a **Clean Architecture + CQRS** approach:
 
 # Notes
 
-Some technical requirements were simplified for the sake of the assessment, for example:
+1. Database is seeded for the authentification part,and the password is **12345** for the built-in users
+2. Some technical requirements were simplified for the sake of the assessment, for example:
 
 - The primary key of most tables is used alone, the common practice is to generate UUID that are hard to guess in order to hide sensitive data.
 - Trips only consist of 2 stations : the departure and the arrival.

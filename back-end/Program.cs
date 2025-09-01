@@ -21,6 +21,7 @@ using backend.Application.Abstractions;
 using backend.Infrastructure.Security;
 using back_end.Application.interfaces;
 var builder = WebApplication.CreateBuilder(args);
+// Cors setup
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowNextJsApp", policy =>
@@ -31,17 +32,18 @@ builder.Services.AddCors(options =>
               .AllowCredentials();
     });
 });
-
+// Jwt key pulling
 var secretKey = builder.Configuration["Jwt:Key"];
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+// MySQL Setup
 builder.Services.AddDbContext<AppDbcontext>(options => options.UseMySql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
         new MySqlServerVersion(new Version(8, 0, 41)),
         mySqlOptions => mySqlOptions.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null)
     ));
-
+// Configuring Authentification
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = "Bearer";
@@ -89,6 +91,7 @@ var perms = new List<Permission>
         new Permission { Id = 7, Name = "ManageStations" },
         new Permission { Id = 8, Name = "ManageTrains" }
     };
+// Configuring Authorization
 builder.Services.AddAuthorization(options =>
 {
     foreach (var permission in perms)
@@ -99,6 +102,7 @@ builder.Services.AddAuthorization(options =>
         });
     }
 });
+// Dependancy Injection for services
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<IUserContext, UserContext>();
@@ -137,6 +141,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.UseCors("AllowNextJsApp");
+// Seeding database
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbcontext>();
@@ -148,7 +153,7 @@ using (var scope = app.Services.CreateScope())
         var clientRole = new Role { Id = 2, Name = "Client" };
 
         context.Roles.AddRange(plannerRole, clientRole);
-
+        // Password is 12345 for both users
         var planner = new User { Id = 1, Nom = "planner", Password = "$2a$11$J7cDcNsIlKGAaFWehF6NjuznMxilF91oxQ2dKWHl4ljNQK5kAT9FW", Email = "admin@example.com", CIN = "A15" };
         var user = new User { Id = 2, Nom = "user1", Password = "$2a$11$J7cDcNsIlKGAaFWehF6NjuznMxilF91oxQ2dKWHl4ljNQK5kAT9FW", Email = "user1@example.com", CIN = "A17" };
 
