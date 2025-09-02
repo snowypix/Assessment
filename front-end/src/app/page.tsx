@@ -123,9 +123,15 @@ export default function HomePage() {
               {user ? (
                 <span className="font-semibold">Hello, {user.username}</span>
               ) : (
-                <Button variant="outline" size="sm" asChild>
-                  <a href="/login">Sign In</a>
-                </Button>
+                <>
+                  {" "}
+                  <Button variant="outline" size="sm" asChild>
+                    <a href="/login">Sign In</a>
+                  </Button>
+                  <Button variant="outline" size="sm" asChild>
+                    <a href="/register">Sign Up</a>
+                  </Button>
+                </>
               )}
               {user && (
                 <Button

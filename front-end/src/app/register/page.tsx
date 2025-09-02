@@ -13,7 +13,10 @@ import { Train } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-
+function getErrorMessage(err: unknown): string {
+  if (err instanceof Error) return err.message;
+  return typeof err === "string" ? err : "Something went wrong";
+}
 export default function RegisterPage() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -43,16 +46,11 @@ export default function RegisterPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Login failed");
+        throw new Error(data.error || "Login failed");
       }
-
       router.push("/");
-    } catch (err) {
-      if (err instanceof Error) {
-        console.error(err.message);
-      } else {
-        console.error("Unknown error", err);
-      }
+    } catch (err: unknown) {
+      setError(getErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -144,6 +142,9 @@ export default function RegisterPage() {
                   </Link>
                 </label>
               </div>
+
+              {error && <p className="text-red-500 text-sm">{error}</p>}
+
               <Button
                 type="submit"
                 className="w-full"
@@ -152,6 +153,7 @@ export default function RegisterPage() {
               >
                 {loading ? "Creating Account ..." : "Create Account"}
               </Button>
+
               <div className="text-center text-sm text-muted-foreground">
                 Already have an account?{" "}
                 <Link
