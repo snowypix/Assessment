@@ -22,12 +22,6 @@ public class AuthController : ControllerBase
         _mediator = mediator;
     }
 
-    [HttpGet("{id}")]
-    [Authorize(Policy = "Invoice.Read")]
-    public IActionResult GetInvoice(int id)
-    {
-        return Ok(new { InvoiceId = id, Status = "Test ok" });
-    }
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] loginDTO loginDto, CancellationToken ct)
@@ -40,7 +34,7 @@ public class AuthController : ControllerBase
         Response.Cookies.Append("auth_token", token, new CookieOptions
         {
             HttpOnly = true,
-            Secure = false, // true in production
+            Secure = false,
             SameSite = SameSiteMode.Strict,
             Expires = DateTime.UtcNow.AddDays(7)
         });

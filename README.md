@@ -71,7 +71,7 @@ The solution follows a **Clean Architecture + CQRS** approach:
 # Notes
 
 1. Database is seeded for the authentification part,and the password is **12345** for the built-in users
-2. Some technical requirements were simplified for the sake of the assessment, for example:
+2. Some technical and business requirements were simplified for the sake of the assessment, for example:
 
 - The primary key of most tables is used alone, the common practice is to generate UUID that are hard to guess in order to hide sensitive data.
 - Trips only consist of 2 stations : the departure and the arrival.
